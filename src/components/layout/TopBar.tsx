@@ -155,9 +155,11 @@ export function TopBar({ showNav = false }: TopBarProps) {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem disabled>
+            <DropdownMenuItem
+              onClick={() => navigate({ to: "/profile/change-password" })}
+            >
               <UserCircle className="mr-2 h-4 w-4" />
-              Profile
+              Change password
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={onLogout} className="text-destructive">

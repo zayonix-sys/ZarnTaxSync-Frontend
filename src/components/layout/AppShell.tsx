@@ -1,5 +1,6 @@
 import { Outlet } from "@tanstack/react-router";
 
+import { EnvironmentBanner } from "@/components/layout/EnvironmentBanner";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { TopBar } from "@/components/layout/TopBar";
 import { usePreferencesStore } from "@/stores/preferences";
@@ -15,6 +16,7 @@ export function AppShell() {
   if (navLayout === "topbar") {
     return (
       <div className="flex min-h-screen flex-col">
+        <EnvironmentBanner />
         <TopBar showNav />
         <main className="flex-1">
           <div className="mx-auto w-full max-w-screen-2xl p-4 md:p-6">
@@ -29,6 +31,7 @@ export function AppShell() {
     <div className="flex min-h-screen w-full bg-muted/30">
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
+        <EnvironmentBanner />
         <TopBar />
         <main className="flex-1">
           <div className="mx-auto w-full max-w-screen-2xl p-4 md:p-6">

@@ -64,9 +64,10 @@ runtime errors.
 | 1 — Auth + Shell | ✅ | Login, refresh-replay, protected layout, theme + nav-layout switch, RequireRole, DataTable |
 | 2 — Tenant onboarding | ✅ | List, create, detail (Overview/Settings/FBR Token/Users tabs), token form, env switch |
 | 3 — Scenarios | ✅ | List, run, certify, scenarioMatrix-driven filtering, B1 warning |
-| 4 — Operator flow | ⏳ | Dashboard, invoice CRUD, Excel upload |
-| 5 — Admin + integration | ⏳ | Users, branches, API keys, integration page |
-| 6 — Polish | ⏳ | Audit logs, reports, products, change password |
+| 4 — Operator flow | ✅ | Dashboard (KPIs + last-7-days chart), invoice list/detail/new (with idempotency key + pre-flight validate + Debit Note Reason/Remarks), Excel upload, IRN lookup, PDF download (Bearer-authed Blob), submission logs accordion |
+| 5 — Admin + integration | ✅ | Users (CRUD + role change + lockout/unlock), branches (incl. head-office guard), API keys (one-time copy modal), integration guide page with cURL sample |
+| 6 — Polish | ✅ | Audit logs (with side-by-side JSON diff), reports (compliance + failed invoices), products (CRUD + CSV import), change password, sandbox-environment banner |
+| Guest login | ⚠️ | Temporary "Continue as guest" entry on the login page — flagged with `// TODO(guest-login)` for easy removal once the real backend session is wired up |
 
 ### Theme + Navigation layout
 
