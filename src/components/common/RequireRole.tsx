@@ -10,7 +10,7 @@ import {
 
 interface RequireRoleProps {
   /** Minimum role required to render `children`. */
-  min: Role;
+  min?: Role;
   /** Optional override roles (any-of). When set, `min` is ignored. */
   anyOf?: Role[];
   children: React.ReactNode;
@@ -27,7 +27,7 @@ interface RequireRoleProps {
  *   <RequireRole anyOf={["SuperAdmin","TenantAdmin"]} hideOnDeny>...</RequireRole>
  */
 export function RequireRole({
-  min,
+  min = "Viewer",
   anyOf,
   children,
   fallback,

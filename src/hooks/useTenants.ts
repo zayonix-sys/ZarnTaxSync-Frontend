@@ -19,7 +19,9 @@ import {
   setSandboxToken,
   updateTenant,
   upsertTenantSetting,
+  onboardTenant,
   type CreateTenantRequest,
+  type CreateTenantOnboardingRequest,
   type FbrTokenRequest,
   type UpdateTenantRequest,
 } from "@/api/tenants";
@@ -54,6 +56,17 @@ export function useCreateTenant() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: [TENANTS_KEY] });
       toast.success("Tenant created");
+    },
+  });
+}
+
+export function useOnboardTenant() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: CreateTenantOnboardingRequest) => onboardTenant(body),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: [TENANTS_KEY] });
+      toast.success("Tenant and admin created");
     },
   });
 }

@@ -15,6 +15,19 @@ export interface CreateTenantRequest {
   planType: PlanType;
 }
 
+export interface CreateTenantOnboardingRequest extends CreateTenantRequest {
+  adminFirstName: string;
+  adminLastName: string;
+  adminEmail: string;
+  adminPassword: string;
+}
+
+export interface TenantOnboardingResponse {
+  tenantId: string;
+  headOfficeBranchId: string;
+  tenantAdminUserId: string;
+}
+
 export interface UpdateTenantRequest {
   name: string;
   ntnCnic: string;
@@ -32,6 +45,13 @@ export async function getTenant(id: string): Promise<Tenant> {
 
 export async function createTenant(body: CreateTenantRequest): Promise<Tenant> {
   const res = await api.post<Tenant>("/tenants", body);
+  return res.data;
+}
+
+export async function onboardTenant(
+  body: CreateTenantOnboardingRequest,
+): Promise<TenantOnboardingResponse> {
+  const res = await api.post<TenantOnboardingResponse>("/tenants/onboard", body);
   return res.data;
 }
 

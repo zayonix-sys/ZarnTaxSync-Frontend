@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowLeft, AlertTriangle, Power, RefreshCw } from "lucide-react";
 
@@ -52,8 +52,16 @@ import {
 } from "@/lib/scenarioMatrix";
 import { formatDate } from "@/lib/format";
 import type { Environment, TenantSetting } from "@/api/types";
+import { ROLE_HIERARCHY } from "@/api/types";
+import { useAuthStore } from "@/stores/auth";
 
 export const Route = createFileRoute("/_auth/tenants/$id")({
+  beforeLoad: () => {
+    const role = useAuthStore.getState().user?.role;
+    if (!role || ROLE_HIERARCHY[role] < ROLE_HIERARCHY.SuperAdmin) {
+      throw redirect({ to: "/dashboard" });
+    }
+  },
   component: TenantDetailPage,
 });
 

@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ZarnTaxSync Test Report - 2026-05-05</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 24px; color: #1f2937; }
+      h1, h2 { margin-bottom: 8px; }
+      .meta { color: #6b7280; margin-bottom: 20px; }
+      table { width: 100%; border-collapse: collapse; margin: 12px 0 24px; }
+      th, td { border: 1px solid #d1d5db; padding: 10px; text-align: left; vertical-align: top; }
+      th { background: #f3f4f6; }
+      .pass { color: #065f46; font-weight: bold; }
+      .warn { color: #92400e; font-weight: bold; }
+      .na { color: #374151; font-weight: bold; }
+      code { background: #f3f4f6; padding: 2px 6px; border-radius: 4px; }
+    </style>
+  </head>
+  <body>
+    <h1>ZarnTaxSync Functional Test Report</h1>
+    <div class="meta">
+      Generated: 2026-05-05 (UTC+5)<br />
+      Scope: Backend (<code>D:\ZarnTaxSync</code>) and Frontend (<code>D:\ZarnTaxSync-Frontend</code>)<br />
+      Commit policy: No commits performed
+    </div>
+
+    <h2>Execution Summary</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Area</th>
+          <th>Command</th>
+          <th>Result</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Backend Automated Tests</td>
+          <td><code>dotnet test</code></td>
+          <td class="pass">PASS</td>
+          <td>Unit Tests: 145/145 passed, Integration Tests: 61/61 passed (Total 206 passed).</td>
+        </tr>
+        <tr>
+          <td>Frontend Unit Test Script</td>
+          <td><code>pnpm -s test</code></td>
+          <td class="na">N/A</td>
+          <td>No test script configured in package scripts (<code>'test' is not recognized</code>).</td>
+        </tr>
+        <tr>
+          <td>Frontend Type Safety</td>
+          <td><code>pnpm -s tsc --noEmit</code></td>
+          <td class="pass">PASS</td>
+          <td>Type checks clean after cleanup fixes.</td>
+        </tr>
+        <tr>
+          <td>Frontend Production Build</td>
+          <td><code>pnpm -s build</code></td>
+          <td class="pass">PASS</td>
+          <td>Build succeeds. Bundle-size warning present for large chunks (&gt;500kB).</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Cleanup Performed</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Action</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Frontend strict typing cleanup</td>
+          <td>Fixed route-role guard typing, mock handler typing, report table column definitions, and unused imports.</td>
+          <td class="pass">Done</td>
+        </tr>
+        <tr>
+          <td>Temporary tooling artifacts</td>
+          <td>Removed generated <code>tsconfig.app.tsbuildinfo</code> and <code>tsconfig.node.tsbuildinfo</code>.</td>
+          <td class="pass">Done</td>
+        </tr>
+        <tr>
+          <td>Audit artifact cleanup</td>
+          <td>Removed temporary canvas audit file used during earlier review.</td>
+          <td class="pass">Done</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Implemented Functional Gaps (This Pass)</h2>
+    <ul>
+      <li>Backend onboarding endpoint: <code>POST /api/v1/tenants/onboard</code> (tenant + head office + tenant admin in one transaction).</li>
+      <li>Backend onboarding DTO + validator + service contract/implementation updates.</li>
+      <li>Frontend onboarding form expanded to collect initial tenant admin data and call new onboarding endpoint.</li>
+      <li>Frontend route-level role guards added to sensitive tenant/user/branch/integration pages.</li>
+      <li>Frontend mock API updated for onboarding parity in guest/dev mode.</li>
+    </ul>
+
+    <h2>Open Notes</h2>
+    <ul>
+      <li class="warn">Backend repository contains pre-existing unrelated migration/solution-file changes not modified in this report pass.</li>
+      <li class="warn">Frontend build size warning remains (non-blocking); optional code-splitting optimization can be done separately.</li>
+    </ul>
+  </body>
+  </html>

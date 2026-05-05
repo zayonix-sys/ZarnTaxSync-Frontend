@@ -220,10 +220,12 @@ function FailedInvoicesTab() {
       accessorKey: "buyerBusinessName",
     },
     {
+      id: "status",
       header: "Status",
       cell: ({ row }) => <InvoiceStatusBadge status={row.original.status} />,
     },
     {
+      id: "tax",
       header: () => <div className="text-right">Tax</div>,
       cell: ({ row }) => (
         <div className="text-right">{formatPKR(row.original.totalSalesTax)}</div>

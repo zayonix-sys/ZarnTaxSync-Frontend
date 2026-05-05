@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
 import type { ColumnDef } from "@tanstack/react-table";
@@ -36,6 +36,8 @@ import {
   useUpdateBranch,
 } from "@/hooks/useBranches";
 import type { Branch } from "@/api/branches";
+import { ROLE_HIERARCHY } from "@/api/types";
+import { useAuthStore } from "@/stores/auth";
 
 const SearchSchema = z.object({
   page: z.number().int().positive().catch(1),
@@ -55,6 +57,12 @@ type BranchFormValues = z.infer<typeof BranchFormSchema>;
 
 export const Route = createFileRoute("/_auth/branches/")({
   validateSearch: SearchSchema,
+  beforeLoad: () => {
+    const role = useAuthStore.getState().user?.role;
+    if (!role || ROLE_HIERARCHY[role] < ROLE_HIERARCHY.BranchManager) {
+      throw redirect({ to: "/dashboard" });
+    }
+  },
   component: BranchesPage,
 });
 

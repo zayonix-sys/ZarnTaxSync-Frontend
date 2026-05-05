@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -60,9 +60,17 @@ import {
 import { useBranchesList } from "@/hooks/useBranches";
 import { formatDate, formatDateTime } from "@/lib/format";
 import type { Role } from "@/api/types";
+import { ROLE_HIERARCHY } from "@/api/types";
 import type { ApiKey, CreateApiKeyResponse } from "@/api/users";
+import { useAuthStore } from "@/stores/auth";
 
 export const Route = createFileRoute("/_auth/users/$id")({
+  beforeLoad: () => {
+    const role = useAuthStore.getState().user?.role;
+    if (!role || ROLE_HIERARCHY[role] < ROLE_HIERARCHY.BranchManager) {
+      throw redirect({ to: "/dashboard" });
+    }
+  },
   component: UserDetailPage,
 });
 

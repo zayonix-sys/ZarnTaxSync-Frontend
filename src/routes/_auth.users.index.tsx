@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
 import type { ColumnDef } from "@tanstack/react-table";
@@ -30,9 +30,10 @@ import { useCreateUser, useUsersList } from "@/hooks/useUsers";
 import { useBranchesList } from "@/hooks/useBranches";
 import { RequireRole } from "@/components/common/RequireRole";
 import { formatDate } from "@/lib/format";
-import type { Role } from "@/api/types";
+import { ROLE_HIERARCHY } from "@/api/types";
 import type { UserListItem } from "@/api/users";
 import { normalizeError } from "@/api/client";
+import { useAuthStore } from "@/stores/auth";
 
 const SearchSchema = z.object({
   page: z.number().int().positive().catch(1),
@@ -53,6 +54,12 @@ type NewUserValues = z.infer<typeof NewUserSchema>;
 
 export const Route = createFileRoute("/_auth/users/")({
   validateSearch: SearchSchema,
+  beforeLoad: () => {
+    const role = useAuthStore.getState().user?.role;
+    if (!role || ROLE_HIERARCHY[role] < ROLE_HIERARCHY.BranchManager) {
+      throw redirect({ to: "/dashboard" });
+    }
+  },
   component: UsersPage,
 });
 
@@ -314,7 +321,7 @@ function CreateUserDialog({
               <Label>Role</Label>
               <Select
                 value={role}
-                onValueChange={(v) => setValue("role", v as Role)}
+                onValueChange={(v) => setValue("role", v as NewUserValues["role"])}
               >
                 <SelectTrigger>
                   <SelectValue />

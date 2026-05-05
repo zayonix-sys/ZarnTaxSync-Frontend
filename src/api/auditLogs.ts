@@ -1,4 +1,4 @@
-import { api, getPaged } from "@/api/client";
+import { getPaged } from "@/api/client";
 import type { PaginationParams } from "@/api/types";
 
 export interface AuditLogEntry {

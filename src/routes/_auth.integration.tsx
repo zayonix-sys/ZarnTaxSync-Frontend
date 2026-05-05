@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { Check, Code2, Copy, KeyRound, Plug } from "lucide-react";
 import { toast } from "sonner";
@@ -14,8 +14,16 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { env } from "@/lib/env";
+import { ROLE_HIERARCHY } from "@/api/types";
+import { useAuthStore } from "@/stores/auth";
 
 export const Route = createFileRoute("/_auth/integration")({
+  beforeLoad: () => {
+    const role = useAuthStore.getState().user?.role;
+    if (!role || ROLE_HIERARCHY[role] < ROLE_HIERARCHY.TenantAdmin) {
+      throw redirect({ to: "/dashboard" });
+    }
+  },
   component: IntegrationPage,
 });
 

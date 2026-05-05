@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -15,8 +15,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useCreateTenant } from "@/hooks/useTenants";
+import { useOnboardTenant } from "@/hooks/useTenants";
 import type { PlanType } from "@/api/types";
+import { useAuthStore } from "@/stores/auth";
 
 const NTN_OR_CNIC = /^\d{7}$|^\d{13}$/;
 
@@ -31,17 +32,33 @@ const TenantSchema = z.object({
     .transform((v) => v.replace(/\D/g, ""))
     .refine((v) => NTN_OR_CNIC.test(v), "Must be a 7-digit NTN or 13-digit CNIC"),
   planType: z.enum(["Standard", "Professional", "Enterprise"]),
+  adminFirstName: z.string().min(1, "Admin first name is required").max(100),
+  adminLastName: z.string().min(1, "Admin last name is required").max(100),
+  adminEmail: z.string().email("Enter a valid admin email"),
+  adminPassword: z
+    .string()
+    .min(8, "Admin password must be at least 8 characters")
+    .regex(/[a-z]/, "Must include a lowercase letter")
+    .regex(/[A-Z]/, "Must include an uppercase letter")
+    .regex(/\d/, "Must include a number")
+    .regex(/[@$!%*?&\-_#^]/, "Must include a special character"),
 });
 
 type TenantFormValues = z.infer<typeof TenantSchema>;
 
 export const Route = createFileRoute("/_auth/tenants/new")({
+  beforeLoad: () => {
+    const role = useAuthStore.getState().user?.role;
+    if (role !== "SuperAdmin") {
+      throw redirect({ to: "/dashboard" });
+    }
+  },
   component: NewTenantPage,
 });
 
 function NewTenantPage() {
   const navigate = useNavigate();
-  const mutation = useCreateTenant();
+  const mutation = useOnboardTenant();
 
   const {
     register,
@@ -56,14 +73,18 @@ function NewTenantPage() {
       subdomain: "",
       ntnCnic: "",
       planType: "Standard",
+      adminFirstName: "",
+      adminLastName: "",
+      adminEmail: "",
+      adminPassword: "",
     },
   });
 
   const planType = watch("planType");
 
   const onSubmit = handleSubmit(async (values) => {
-    const tenant = await mutation.mutateAsync(values);
-    navigate({ to: "/tenants/$id", params: { id: tenant.id } });
+    const result = await mutation.mutateAsync(values);
+    navigate({ to: "/tenants/$id", params: { id: result.tenantId } });
   });
 
   return (
@@ -148,9 +169,49 @@ function NewTenantPage() {
               )}
             </div>
 
+            <div className="pt-2">
+              <h2 className="text-sm font-medium">Initial Tenant Admin</h2>
+              <p className="text-xs text-muted-foreground">
+                This user is created automatically during onboarding.
+              </p>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="adminFirstName">First name</Label>
+                <Input id="adminFirstName" {...register("adminFirstName")} />
+                {errors.adminFirstName && (
+                  <p className="text-xs text-destructive">{errors.adminFirstName.message}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="adminLastName">Last name</Label>
+                <Input id="adminLastName" {...register("adminLastName")} />
+                {errors.adminLastName && (
+                  <p className="text-xs text-destructive">{errors.adminLastName.message}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="adminEmail">Email</Label>
+              <Input id="adminEmail" type="email" {...register("adminEmail")} />
+              {errors.adminEmail && (
+                <p className="text-xs text-destructive">{errors.adminEmail.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="adminPassword">Temporary password</Label>
+              <Input id="adminPassword" type="password" autoComplete="new-password" {...register("adminPassword")} />
+              {errors.adminPassword && (
+                <p className="text-xs text-destructive">{errors.adminPassword.message}</p>
+              )}
+            </div>
+
             <div className="flex items-center gap-2 pt-2">
               <Button type="submit" disabled={isSubmitting || mutation.isPending}>
-                {mutation.isPending ? "Creating..." : "Create tenant"}
+                {mutation.isPending ? "Creating..." : "Create tenant and admin"}
               </Button>
               <Button type="button" variant="ghost" asChild>
                 <Link to="/tenants">Cancel</Link>

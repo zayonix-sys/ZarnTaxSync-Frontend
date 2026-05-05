@@ -76,14 +76,18 @@ function readPaging(query: URLSearchParams) {
   return { pageNumber, pageSize, search };
 }
 
-function search<T extends Record<string, unknown>>(
+function search<T extends object>(
   items: T[],
   q: string,
   fields: Array<keyof T>,
 ): T[] {
   if (!q) return items;
   return items.filter((it) =>
-    fields.some((f) => String(it[f] ?? "").toLowerCase().includes(q)),
+    fields.some((f) =>
+      String((it as Record<string, unknown>)[String(f)] ?? "")
+        .toLowerCase()
+        .includes(q),
+    ),
   );
 }
 
@@ -131,6 +135,73 @@ mock<Tenant>("POST", "/tenants", ({ body }) => {
   };
   tenants.unshift(t);
   return { data: t, status: 201 };
+});
+
+mock<{
+  tenantId: string;
+  headOfficeBranchId: string;
+  tenantAdminUserId: string;
+}>("POST", "/tenants/onboard", ({ body }) => {
+  const b = body as {
+    name: string;
+    subdomain: string;
+    ntnCnic: string;
+    planType: Tenant["planType"];
+    adminFirstName: string;
+    adminLastName: string;
+    adminEmail: string;
+  };
+
+  const tenantId = fixtures.uuid();
+  const branchId = fixtures.uuid();
+  const userId = fixtures.uuid();
+
+  const tenant: Tenant = {
+    id: tenantId,
+    name: b.name,
+    subdomain: b.subdomain,
+    ntnCnic: b.ntnCnic,
+    planType: b.planType,
+    isActive: true,
+    branchCount: 1,
+    userCount: 1,
+    createdAt: new Date().toISOString(),
+  };
+  tenants.unshift(tenant);
+
+  branches.unshift({
+    id: branchId,
+    code: "HO",
+    name: "Head Office",
+    address: "",
+    province: undefined,
+    isActive: true,
+    userCount: 1,
+    createdAt: new Date().toISOString(),
+  });
+
+  users.unshift({
+    id: userId,
+    firstName: b.adminFirstName,
+    lastName: b.adminLastName,
+    fullName: `${b.adminFirstName} ${b.adminLastName}`,
+    email: b.adminEmail,
+    role: "TenantAdmin",
+    branchId,
+    branchName: "Head Office",
+    isActive: true,
+    lastLoginAt: null,
+    createdAt: new Date().toISOString(),
+  });
+
+  return {
+    data: {
+      tenantId,
+      headOfficeBranchId: branchId,
+      tenantAdminUserId: userId,
+    },
+    status: 201,
+  };
 });
 
 mock<Tenant>("PUT", "/tenants/:id", ({ pathParams, body }) => {

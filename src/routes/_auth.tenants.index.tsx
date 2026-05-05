@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Building2, Plus, Search } from "lucide-react";
@@ -9,7 +9,9 @@ import { Input } from "@/components/ui/input";
 import { DataTable } from "@/components/common/DataTable";
 import { useTenantsList } from "@/hooks/useTenants";
 import type { Tenant } from "@/api/types";
+import { ROLE_HIERARCHY } from "@/api/types";
 import { formatDate } from "@/lib/format";
+import { useAuthStore } from "@/stores/auth";
 
 const SearchSchema = z.object({
   page: z.number().int().positive().catch(1),
@@ -18,6 +20,12 @@ const SearchSchema = z.object({
 
 export const Route = createFileRoute("/_auth/tenants/")({
   validateSearch: SearchSchema,
+  beforeLoad: () => {
+    const role = useAuthStore.getState().user?.role;
+    if (!role || ROLE_HIERARCHY[role] < ROLE_HIERARCHY.SuperAdmin) {
+      throw redirect({ to: "/dashboard" });
+    }
+  },
   component: TenantsIndexPage,
 });
 
