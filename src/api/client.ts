@@ -201,19 +201,25 @@ export async function getPaged<T>(
   url: string,
   config?: AxiosRequestConfig,
 ): Promise<{ items: T[]; pagination: NonNullable<ApiResponse<unknown>["pagination"]> }> {
-  const res = (await api.get<T[]>(url, config)) as AxiosResponse<T[]> & {
+  const res = (await api.get<any>(url, config)) as AxiosResponse<any> & {
     pagination?: ApiResponse<unknown>["pagination"];
   };
+
+  const data = res.data;
+  const items = Array.isArray(data) 
+    ? data 
+    : (data && Array.isArray(data.items) ? data.items : []);
+
   return {
-    items: Array.isArray(res.data) ? res.data : [],
+    items,
     pagination:
       res.pagination ?? {
-        pageNumber: 1,
-        pageSize: res.data?.length ?? 0,
-        totalCount: res.data?.length ?? 0,
-        totalPages: 1,
-        hasPreviousPage: false,
-        hasNextPage: false,
+        pageNumber: data?.pageNumber ?? 1,
+        pageSize: data?.pageSize ?? items.length,
+        totalCount: data?.totalCount ?? items.length,
+        totalPages: data?.totalPages ?? 1,
+        hasPreviousPage: data?.hasPreviousPage ?? false,
+        hasNextPage: data?.hasNextPage ?? false,
       },
   };
 }
