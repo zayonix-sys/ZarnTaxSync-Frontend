@@ -15,6 +15,7 @@ import {
   getUser,
   listApiKeys,
   listUsers,
+  resetUserPassword,
   revokeApiKey,
   unlockUser,
   updateUser,
@@ -101,6 +102,15 @@ export function useUnlockUser(id: string) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: [USER_KEY, id] });
       toast.success("User unlocked");
+    },
+  });
+}
+
+export function useResetUserPassword(id: string) {
+  return useMutation({
+    mutationFn: (newPassword: string) => resetUserPassword(id, newPassword),
+    onSuccess: () => {
+      toast.success("Password reset — user must sign in again.");
     },
   });
 }

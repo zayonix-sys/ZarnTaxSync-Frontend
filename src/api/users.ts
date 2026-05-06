@@ -97,6 +97,10 @@ export async function unlockUser(id: string): Promise<void> {
   await api.post<null>(`/users/${id}/unlock`);
 }
 
+export async function resetUserPassword(id: string, newPassword: string): Promise<void> {
+  await api.post<null>(`/users/${id}/reset-password`, { newPassword });
+}
+
 export async function listApiKeys(userId: string): Promise<ApiKey[]> {
   const res = await api.get<ApiKey[]>(`/users/${userId}/api-keys`);
   return res.data;

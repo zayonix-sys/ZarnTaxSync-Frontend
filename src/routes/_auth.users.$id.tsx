@@ -51,6 +51,7 @@ import {
   useApiKeys,
   useChangeUserRole,
   useCreateApiKey,
+  useResetUserPassword,
   useRevokeApiKey,
   useToggleUserActive,
   useUnlockUser,
@@ -179,32 +180,46 @@ function UserActions({
 }) {
   const toggle = useToggleUserActive(id);
   const unlock = useUnlockUser(id);
+  const [resetOpen, setResetOpen] = useState(false);
 
   return (
-    <div className="flex flex-wrap gap-2">
-      {isLockedOut && (
-        <RequireRole anyOf={["SuperAdmin", "TenantAdmin"]} hideOnDeny>
-          <Button
-            variant="outline"
-            onClick={() => unlock.mutate()}
-            disabled={unlock.isPending}
-          >
-            {unlock.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Unlock className="h-4 w-4" />}
-            Unlock
+    <>
+      <div className="flex flex-wrap gap-2">
+        {isLockedOut && (
+          <RequireRole anyOf={["SuperAdmin", "TenantAdmin"]} hideOnDeny>
+            <Button
+              variant="outline"
+              onClick={() => unlock.mutate()}
+              disabled={unlock.isPending}
+            >
+              {unlock.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Unlock className="h-4 w-4" />}
+              Unlock
+            </Button>
+          </RequireRole>
+        )}
+        <RequireRole anyOf={["SuperAdmin"]} hideOnDeny>
+          <Button variant="outline" onClick={() => setResetOpen(true)}>
+            <KeyRound className="h-4 w-4" />
+            Reset password
           </Button>
         </RequireRole>
-      )}
-      <RequireRole anyOf={["SuperAdmin", "TenantAdmin"]} hideOnDeny>
-        <Button
-          variant={isActive ? "outline" : "default"}
-          onClick={() => toggle.mutate({ activate: !isActive })}
-          disabled={toggle.isPending}
-        >
-          <Power className="h-4 w-4" />
-          {isActive ? "Deactivate" : "Activate"}
-        </Button>
-      </RequireRole>
-    </div>
+        <RequireRole anyOf={["SuperAdmin", "TenantAdmin"]} hideOnDeny>
+          <Button
+            variant={isActive ? "outline" : "default"}
+            onClick={() => toggle.mutate({ activate: !isActive })}
+            disabled={toggle.isPending}
+          >
+            <Power className="h-4 w-4" />
+            {isActive ? "Deactivate" : "Activate"}
+          </Button>
+        </RequireRole>
+      </div>
+      <ResetPasswordDialog
+        userId={id}
+        open={resetOpen}
+        onClose={() => setResetOpen(false)}
+      />
+    </>
   );
 }
 
@@ -490,6 +505,103 @@ const NewKeySchema = z.object({
   expiresAt: z.string().optional(),
 });
 type NewKeyValues = z.infer<typeof NewKeySchema>;
+
+// ---------------- Reset Password dialog (SuperAdmin only) -------------------
+
+const ResetPwSchema = z.object({
+  newPassword: z
+    .string()
+    .min(8, "At least 8 characters")
+    .regex(/[a-z]/, "Must include a lowercase letter")
+    .regex(/[A-Z]/, "Must include an uppercase letter")
+    .regex(/\d/, "Must include a number")
+    .regex(/[@$!%*?&\-_#^]/, "Must include a special character"),
+  confirm: z.string(),
+}).refine((d) => d.newPassword === d.confirm, {
+  message: "Passwords do not match",
+  path: ["confirm"],
+});
+type ResetPwValues = z.infer<typeof ResetPwSchema>;
+
+function ResetPasswordDialog({
+  userId,
+  open,
+  onClose,
+}: {
+  userId: string;
+  open: boolean;
+  onClose: () => void;
+}) {
+  const reset = useResetUserPassword(userId);
+  const {
+    register,
+    handleSubmit,
+    reset: resetForm,
+    formState: { errors },
+  } = useForm<ResetPwValues>({
+    resolver: zodResolver(ResetPwSchema),
+    defaultValues: { newPassword: "", confirm: "" },
+  });
+
+  const onSubmit = handleSubmit(async ({ newPassword }) => {
+    try {
+      await reset.mutateAsync(newPassword);
+      resetForm();
+      onClose();
+    } catch {
+      // error toast already shown by the axios interceptor
+    }
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => { if (!o) { resetForm(); onClose(); } }}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Reset password</DialogTitle>
+          <DialogDescription>
+            Set a new password for this user. They will be signed out of all
+            active sessions immediately.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={onSubmit} className="space-y-3">
+          <div className="space-y-1">
+            <Label htmlFor="newPassword">New password</Label>
+            <Input
+              id="newPassword"
+              type="password"
+              autoComplete="new-password"
+              {...register("newPassword")}
+            />
+            {errors.newPassword && (
+              <p className="text-xs text-destructive">{errors.newPassword.message}</p>
+            )}
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="confirm">Confirm password</Label>
+            <Input
+              id="confirm"
+              type="password"
+              autoComplete="new-password"
+              {...register("confirm")}
+            />
+            {errors.confirm && (
+              <p className="text-xs text-destructive">{errors.confirm.message}</p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="ghost" onClick={() => { resetForm(); onClose(); }}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={reset.isPending}>
+              {reset.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <KeyRound className="h-4 w-4" />}
+              Reset password
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 function CreateApiKeyDialog({
   open,
