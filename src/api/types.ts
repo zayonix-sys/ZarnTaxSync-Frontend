@@ -81,6 +81,8 @@ export interface Tenant {
   isActive: boolean;
   branchCount: number;
   userCount: number;
+  /** Tenant admin contact email (list projection from backend). */
+  adminEmail?: string | null;
   createdAt: string;
 }
 

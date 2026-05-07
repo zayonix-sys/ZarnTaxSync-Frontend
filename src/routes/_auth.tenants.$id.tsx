@@ -1,6 +1,6 @@
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowLeft, AlertTriangle, Power, RefreshCw } from "lucide-react";
+import { ArrowLeft, AlertTriangle, Pencil, Power, RefreshCw } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/ui/password-input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
@@ -40,6 +41,7 @@ import {
   useTenantSettings,
   useToggleTenantActive,
   useTokenStatus,
+  useUpdateTenant,
   useUpsertTenantSetting,
 } from "@/hooks/useTenants";
 import { useTenantProfileStore } from "@/stores/tenantProfile";
@@ -51,14 +53,18 @@ import {
   type Sector,
 } from "@/lib/scenarioMatrix";
 import { formatDate } from "@/lib/format";
-import type { Environment, TenantSetting } from "@/api/types";
+import type { Environment, PlanType, TenantSetting } from "@/api/types";
 import { ROLE_HIERARCHY } from "@/api/types";
 import { useAuthStore } from "@/stores/auth";
 
 export const Route = createFileRoute("/_auth/tenants/$id")({
-  beforeLoad: () => {
-    const role = useAuthStore.getState().user?.role;
-    if (!role || ROLE_HIERARCHY[role] < ROLE_HIERARCHY.SuperAdmin) {
+  beforeLoad: ({ params }) => {
+    const user = useAuthStore.getState().user;
+    const role = user?.role;
+    const isSuperAdmin = !!role && ROLE_HIERARCHY[role] >= ROLE_HIERARCHY.SuperAdmin;
+    const isTenantAdminForSameTenant =
+      role === "TenantAdmin" && user?.tenantId === params.id;
+    if (!isSuperAdmin && !isTenantAdminForSameTenant) {
       throw redirect({ to: "/dashboard" });
     }
   },
@@ -67,9 +73,13 @@ export const Route = createFileRoute("/_auth/tenants/$id")({
 
 function TenantDetailPage() {
   const { id } = Route.useParams();
+  const role = useAuthStore((s) => s.user?.role);
+  const isSuperAdmin = !!role && ROLE_HIERARCHY[role] >= ROLE_HIERARCHY.SuperAdmin;
   const { data: tenant, isLoading } = useTenant(id);
   const { data: tokenStatus } = useTokenStatus(id);
+  const updateTenant = useUpdateTenant(id);
   const navigate = useNavigate();
+  const [editOpen, setEditOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -128,8 +138,21 @@ function TenantDetailPage() {
               {tenant.subdomain}.zarntaxsync.com · NTN/CNIC {tenant.ntnCnic} ·
               created {formatDate(tenant.createdAt)}
             </p>
+            {tenant.adminEmail && (
+              <p className="text-xs text-muted-foreground">
+                Admin email: {tenant.adminEmail}
+              </p>
+            )}
           </div>
-          <ActiveToggle id={id} active={tenant.isActive} onSuccess={() => navigate({ to: "/tenants/$id", params: { id } })} />
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={() => setEditOpen(true)}>
+              <Pencil className="h-4 w-4" />
+              Edit profile
+            </Button>
+            {isSuperAdmin && (
+              <ActiveToggle id={id} active={tenant.isActive} onSuccess={() => navigate({ to: "/tenants/$id", params: { id } })} />
+            )}
+          </div>
         </div>
       </div>
 
@@ -187,7 +210,109 @@ function TenantDetailPage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      <EditTenantDialog
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        name={tenant.name}
+        ntnCnic={tenant.ntnCnic}
+        planType={tenant.planType}
+        onSave={async (values) => {
+          await updateTenant.mutateAsync(values);
+          setEditOpen(false);
+        }}
+        loading={updateTenant.isPending}
+      />
     </div>
+  );
+}
+
+function EditTenantDialog({
+  open,
+  onOpenChange,
+  name,
+  ntnCnic,
+  planType,
+  onSave,
+  loading,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  name: string;
+  ntnCnic: string;
+  planType: PlanType;
+  onSave: (values: { name: string; ntnCnic: string; planType: PlanType }) => Promise<void>;
+  loading: boolean;
+}) {
+  const [form, setForm] = useState({ name, ntnCnic, planType });
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        if (next) setForm({ name, ntnCnic, planType });
+        onOpenChange(next);
+      }}
+    >
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edit tenant profile</DialogTitle>
+          <DialogDescription>
+            Allowed for SuperAdmin and TenantAdmin of this tenant.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-3">
+          <div className="space-y-1">
+            <Label htmlFor="tenant-name">Business name</Label>
+            <Input
+              id="tenant-name"
+              value={form.name}
+              onChange={(e) => setForm((s) => ({ ...s, name: e.target.value }))}
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="tenant-ntn">NTN / CNIC</Label>
+            <Input
+              id="tenant-ntn"
+              value={form.ntnCnic}
+              onChange={(e) => setForm((s) => ({ ...s, ntnCnic: e.target.value }))}
+            />
+          </div>
+          <div className="space-y-1">
+            <Label>Plan</Label>
+            <Select
+              value={form.planType}
+              onValueChange={(v) =>
+                setForm((s) => ({
+                  ...s,
+                  planType: v as PlanType,
+                }))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Standard">Standard</SelectItem>
+                <SelectItem value="Professional">Professional</SelectItem>
+                <SelectItem value="Enterprise">Enterprise</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button
+            disabled={loading}
+            onClick={() => onSave(form)}
+          >
+            Save changes
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -395,28 +520,24 @@ function SettingValueInput({
   onSave: (value: string) => void;
 }) {
   const [value, setValue] = useState(setting.value);
-  const [revealed, setRevealed] = useState(!setting.isEncrypted);
   return (
-    <div className="flex items-center gap-2">
-      <Input
-        type={setting.isEncrypted && !revealed ? "password" : "text"}
+    setting.isEncrypted ? (
+      <PasswordInput
         value={value}
         onChange={(e) => setValue(e.target.value)}
         onBlur={() => {
           if (value !== setting.value) onSave(value);
         }}
       />
-      {setting.isEncrypted && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => setRevealed((r) => !r)}
-        >
-          {revealed ? "Hide" : "Reveal"}
-        </Button>
-      )}
-    </div>
+    ) : (
+      <Input
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onBlur={() => {
+          if (value !== setting.value) onSave(value);
+        }}
+      />
+    )
   );
 }
 

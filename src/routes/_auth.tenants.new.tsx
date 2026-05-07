@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/ui/password-input";
 import {
   Select,
   SelectContent,
@@ -203,7 +204,7 @@ function NewTenantPage() {
 
             <div className="space-y-2">
               <Label htmlFor="adminPassword">Temporary password</Label>
-              <Input id="adminPassword" type="password" autoComplete="new-password" {...register("adminPassword")} />
+              <PasswordInput id="adminPassword" autoComplete="new-password" {...register("adminPassword")} />
               {errors.adminPassword && (
                 <p className="text-xs text-destructive">{errors.adminPassword.message}</p>
               )}

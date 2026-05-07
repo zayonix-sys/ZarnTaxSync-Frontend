@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/ui/password-input";
 import {
   Select,
   SelectContent,
@@ -30,6 +31,7 @@ import { useCreateUser, useUsersList } from "@/hooks/useUsers";
 import { useBranchesList } from "@/hooks/useBranches";
 import { RequireRole } from "@/components/common/RequireRole";
 import { formatDate } from "@/lib/format";
+import { formatRoleLabel } from "@/lib/roles";
 import { ROLE_HIERARCHY } from "@/api/types";
 import type { UserListItem } from "@/api/users";
 import { normalizeError } from "@/api/client";
@@ -107,7 +109,7 @@ function UsersPage() {
     {
       header: "Role",
       accessorKey: "role",
-      cell: ({ row }) => <Badge variant="outline">{row.original.role}</Badge>,
+      cell: ({ row }) => <Badge variant="outline">{formatRoleLabel(row.original.role)}</Badge>,
     },
     {
       header: "Status",
@@ -289,9 +291,8 @@ function CreateUserDialog({
           </div>
           <div className="space-y-1">
             <Label htmlFor="password">Initial password</Label>
-            <Input
+            <PasswordInput
               id="password"
-              type="password"
               autoComplete="new-password"
               {...register("password")}
             />
@@ -327,8 +328,8 @@ function CreateUserDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="TenantAdmin">TenantAdmin</SelectItem>
-                  <SelectItem value="BranchManager">BranchManager</SelectItem>
+                  <SelectItem value="TenantAdmin">Tenant Admin</SelectItem>
+                  <SelectItem value="BranchManager">Branch Manager</SelectItem>
                   <SelectItem value="Operator">Operator</SelectItem>
                   <SelectItem value="Viewer">Viewer</SelectItem>
                 </SelectContent>

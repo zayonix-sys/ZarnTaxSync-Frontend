@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/ui/password-input";
 import {
   Select,
   SelectContent,
@@ -60,6 +61,7 @@ import {
 } from "@/hooks/useUsers";
 import { useBranchesList } from "@/hooks/useBranches";
 import { formatDate, formatDateTime } from "@/lib/format";
+import { formatRoleLabel } from "@/lib/roles";
 import type { Role } from "@/api/types";
 import { ROLE_HIERARCHY } from "@/api/types";
 import type { ApiKey, CreateApiKeyResponse } from "@/api/users";
@@ -121,7 +123,7 @@ function UserDetailPage() {
               <Mail className="mr-1 inline h-3.5 w-3.5" />
               {user.email}
               {" · "}
-              <Badge variant="outline">{user.role}</Badge>
+              <Badge variant="outline">{formatRoleLabel(user.role)}</Badge>
               {" · "}
               {user.isActive ? (
                 <Badge variant="success">Active</Badge>
@@ -333,7 +335,7 @@ function RoleTab({ id, role }: { id: string; role: Role }) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="outline">Current: {role}</Badge>
+          <Badge variant="outline">Current: {formatRoleLabel(role)}</Badge>
         </div>
 
         <div className="flex flex-wrap items-end gap-3">
@@ -347,8 +349,8 @@ function RoleTab({ id, role }: { id: string; role: Role }) {
                 <SelectValue placeholder="Select new role" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="TenantAdmin">TenantAdmin</SelectItem>
-                <SelectItem value="BranchManager">BranchManager</SelectItem>
+                <SelectItem value="TenantAdmin">Tenant Admin</SelectItem>
+                <SelectItem value="BranchManager">Branch Manager</SelectItem>
                 <SelectItem value="Operator">Operator</SelectItem>
                 <SelectItem value="Viewer">Viewer</SelectItem>
               </SelectContent>
@@ -566,9 +568,8 @@ function ResetPasswordDialog({
         <form onSubmit={onSubmit} className="space-y-3">
           <div className="space-y-1">
             <Label htmlFor="newPassword">New password</Label>
-            <Input
+            <PasswordInput
               id="newPassword"
-              type="password"
               autoComplete="new-password"
               {...register("newPassword")}
             />
@@ -578,9 +579,8 @@ function ResetPasswordDialog({
           </div>
           <div className="space-y-1">
             <Label htmlFor="confirm">Confirm password</Label>
-            <Input
+            <PasswordInput
               id="confirm"
-              type="password"
               autoComplete="new-password"
               {...register("confirm")}
             />

@@ -11,19 +11,21 @@ import {
 const SCENARIOS_KEY = "scenarios";
 const SCENARIO_SUMMARY_KEY = "scenario-summary";
 
-export function useScenariosList() {
+export function useScenariosList(enabled = true) {
   return useQuery({
     queryKey: [SCENARIOS_KEY],
     queryFn: listScenarios,
     staleTime: 30_000,
+    enabled,
   });
 }
 
-export function useScenarioSummary() {
+export function useScenarioSummary(enabled = true) {
   return useQuery({
     queryKey: [SCENARIO_SUMMARY_KEY],
     queryFn: getScenarioSummary,
     staleTime: 30_000,
+    enabled,
   });
 }
 

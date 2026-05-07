@@ -1,7 +1,7 @@
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Building2, Plus, Search } from "lucide-react";
+import { Building2, Pencil, Plus, Search } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -83,6 +83,13 @@ function TenantsIndexPage() {
       cell: ({ row }) => <Badge variant="outline">{row.original.planType}</Badge>,
     },
     {
+      header: "Admin email",
+      accessorKey: "adminEmail",
+      cell: ({ row }) => (
+        <span className="text-muted-foreground">{row.original.adminEmail ?? "—"}</span>
+      ),
+    },
+    {
       header: "Branches",
       accessorKey: "branchCount",
     },
@@ -107,6 +114,18 @@ function TenantsIndexPage() {
         <span className="text-muted-foreground">
           {formatDate(row.original.createdAt)}
         </span>
+      ),
+    },
+    {
+      id: "actions",
+      header: () => <span className="sr-only">Actions</span>,
+      cell: ({ row }) => (
+        <Button asChild variant="ghost" size="sm">
+          <Link to="/tenants/$id" params={{ id: row.original.id }}>
+            <Pencil className="h-3.5 w-3.5" />
+            Edit
+          </Link>
+        </Button>
       ),
     },
   ];
@@ -135,7 +154,7 @@ function TenantsIndexPage() {
         <div className="relative flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search by name or NTN/CNIC"
+            placeholder="Search by name, subdomain, or NTN/CNIC"
             defaultValue={search.search ?? ""}
             onChange={(e) => onSearchChange(e.target.value)}
             className="pl-9"

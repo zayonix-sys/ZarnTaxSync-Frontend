@@ -46,8 +46,9 @@ function ScenariosPage() {
     [profile],
   );
 
-  const { data: scenarios, isLoading } = useScenariosList();
-  const { data: summary } = useScenarioSummary();
+  const hasTenantContext = Boolean(tenantId);
+  const { data: scenarios, isLoading } = useScenariosList(hasTenantContext);
+  const { data: summary } = useScenarioSummary(hasTenantContext);
 
   const filtered = useMemo(() => {
     if (!scenarios) return [];
