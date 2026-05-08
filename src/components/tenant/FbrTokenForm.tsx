@@ -1,13 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
+import { parseISO, format } from "date-fns";
 import { z } from "zod";
 import { AlertTriangle } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   useSetProductionToken,
   useSetSandboxToken,
@@ -34,6 +34,7 @@ export function FbrTokenForm({ tenantId, environment }: FbrTokenFormProps) {
   const mutation = environment === "Sandbox" ? sandboxMutation : productionMutation;
 
   const {
+    control,
     register,
     handleSubmit,
     reset,
@@ -61,29 +62,34 @@ export function FbrTokenForm({ tenantId, environment }: FbrTokenFormProps) {
         </Alert>
       )}
 
-      <div className="space-y-2">
-        <Label htmlFor="token">{environment} token</Label>
-        <Textarea
-          id="token"
-          rows={4}
-          autoComplete="off"
-          spellCheck={false}
-          placeholder="Paste the PRAL bearer token here"
-          className="font-mono text-xs"
-          {...register("token")}
-        />
+      <Textarea
+        id="token"
+        label={`${environment} token`}
+        rows={4}
+        autoComplete="off"
+        spellCheck={false}
+        className="font-mono text-xs"
+        {...register("token")}
+      />
         {errors.token && (
           <p className="text-xs text-destructive">{errors.token.message}</p>
         )}
-      </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="expiresAt">Expires at</Label>
-        <Input id="expiresAt" type="date" {...register("expiresAt")} />
+      <Controller
+        control={control}
+        name="expiresAt"
+        render={({ field }) => (
+          <DatePicker
+            id="expiresAt"
+            label="Expires at"
+            date={field.value ? parseISO(field.value) : undefined}
+            onChange={(d) => field.onChange(d ? format(d, "yyyy-MM-dd") : "")}
+          />
+        )}
+      />
         {errors.expiresAt && (
           <p className="text-xs text-destructive">{errors.expiresAt.message}</p>
         )}
-      </div>
 
       <Button type="submit" disabled={isSubmitting || mutation.isPending}>
         {mutation.isPending ? "Saving..." : `Save ${environment} token`}

@@ -21,7 +21,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
@@ -262,24 +261,19 @@ function EditTenantDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
-          <div className="space-y-1">
-            <Label htmlFor="tenant-name">Business name</Label>
             <Input
               id="tenant-name"
+              label="Business name"
               value={form.name}
               onChange={(e) => setForm((s) => ({ ...s, name: e.target.value }))}
             />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="tenant-ntn">NTN / CNIC</Label>
             <Input
               id="tenant-ntn"
+              label="NTN / CNIC"
               value={form.ntnCnic}
               onChange={(e) => setForm((s) => ({ ...s, ntnCnic: e.target.value }))}
             />
-          </div>
           <div className="space-y-1">
-            <Label>Plan</Label>
             <Select
               value={form.planType}
               onValueChange={(v) =>
@@ -289,7 +283,7 @@ function EditTenantDialog({
                 }))
               }
             >
-              <SelectTrigger>
+              <SelectTrigger label="Plan">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -404,15 +398,14 @@ function OverviewTab({ tenantId }: { tenantId: string }) {
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label>Activity</Label>
             <Select
               value={profile?.businessActivity ?? ""}
               onValueChange={(v) =>
                 setProfile(tenantId, { businessActivity: v as BusinessActivity })
               }
             >
-              <SelectTrigger>
-                <SelectValue placeholder="Select activity" />
+              <SelectTrigger label="Activity">
+                <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {BUSINESS_ACTIVITY_OPTIONS.map((o) => (
@@ -424,15 +417,14 @@ function OverviewTab({ tenantId }: { tenantId: string }) {
             </Select>
           </div>
           <div className="space-y-2">
-            <Label>Sector</Label>
             <Select
               value={profile?.sector ?? ""}
               onValueChange={(v) =>
                 setProfile(tenantId, { sector: v as Sector })
               }
             >
-              <SelectTrigger>
-                <SelectValue placeholder="Select sector" />
+              <SelectTrigger label="Sector">
+                <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {SECTOR_OPTIONS.map((o) => (

@@ -17,12 +17,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
 import { NavLayoutToggle } from "@/components/common/NavLayoutToggle";
+import { ThemeCustomizer } from "@/components/common/ThemeCustomizer";
+import { CommandPalette } from "@/components/common/CommandPalette";
 import { Logo } from "@/components/common/Logo";
 import { revokeToken } from "@/api/auth";
 import { useAuthStore } from "@/stores/auth";
 import { usePreferencesStore } from "@/stores/preferences";
 import { cn } from "@/lib/utils";
-import { filterNavByRole, NAV_ITEMS } from "@/components/layout/navigation";
+import { filterNavByRole, getToneClasses, NAV_ITEMS } from "@/components/layout/navigation";
 
 interface TopBarProps {
   /** When true, render the navigation links inline (used in `topbar` layout). */
@@ -37,8 +39,11 @@ export function TopBar({ showNav = false }: TopBarProps) {
   // TODO(guest-login): remove `isGuest` and the badge / logout short-circuit below.
   const isGuest = useAuthStore((s) => s.isGuest);
   const navLayout = usePreferencesStore((s) => s.navLayout);
+  const iconTheme = usePreferencesStore((s) => s.iconTheme);
+  const navDensity = usePreferencesStore((s) => s.navDensity);
   const { location } = useRouterState();
   const navItems = filterNavByRole(NAV_ITEMS, user?.role);
+  const dense = navDensity === "compact";
 
   const initials = (user?.fullName || user?.email || "U")
     .split(" ")
@@ -65,7 +70,7 @@ export function TopBar({ showNav = false }: TopBarProps) {
   const segments = location.pathname.split("/").filter(Boolean);
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur-md md:px-6">
+    <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b bg-background/80 px-4 shadow-soft backdrop-blur-md md:px-6">
       {navLayout === "topbar" && <Logo />}
 
       {showNav ? (
@@ -73,6 +78,18 @@ export function TopBar({ showNav = false }: TopBarProps) {
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = location.pathname.startsWith(item.to);
+            const tone = getToneClasses(item.tone);
+            const iconBox = cn(
+              "grid place-items-center rounded-lg transition-all",
+              dense ? "h-8 w-8" : "h-9 w-9",
+              iconTheme === "mono" &&
+                cn(
+                  "text-muted-foreground group-hover:text-foreground",
+                  active && "text-primary",
+                ),
+              iconTheme === "color" && cn(tone.soft, active && "ring-1 ring-primary/10"),
+              iconTheme === "gradient" && cn(tone.gradient, active && "ring-1 ring-white/10"),
+            );
             return (
               <Link
                 key={item.to}
@@ -83,15 +100,18 @@ export function TopBar({ showNav = false }: TopBarProps) {
                   if (item.comingSoon) e.preventDefault();
                 }}
                 className={cn(
-                  "inline-flex h-9 items-center gap-2 rounded-md px-3 text-sm font-medium transition-colors",
+                  "group inline-flex items-center gap-2 rounded-lg px-2.5 text-sm font-medium transition-colors",
+                  dense ? "h-9" : "h-10",
                   active
-                    ? "bg-secondary text-foreground"
+                    ? "bg-secondary text-foreground shadow-sm"
                     : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
                   item.comingSoon && "opacity-60",
                 )}
               >
-                <Icon className="h-4 w-4" />
-                {item.label}
+                <span className={iconBox}>
+                  <Icon className={cn(dense ? "h-4 w-4" : "h-[18px] w-[18px]")} />
+                </span>
+                <span>{item.label}</span>
               </Link>
             );
           })}
@@ -123,7 +143,9 @@ export function TopBar({ showNav = false }: TopBarProps) {
           </Badge>
         )}
         <NavLayoutToggle />
+        <CommandPalette />
         <ThemeToggle />
+        <ThemeCustomizer />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

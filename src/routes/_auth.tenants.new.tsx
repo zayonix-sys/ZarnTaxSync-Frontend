@@ -7,7 +7,6 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
 import {
   Select,
@@ -111,24 +110,22 @@ function NewTenantPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={onSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Business name</Label>
-              <Input id="name" placeholder="Acme Pvt Ltd" {...register("name")} />
+            <div className="space-y-1">
+              <Input id="name" label="Business name" {...register("name")} />
               {errors.name && (
                 <p className="text-xs text-destructive">{errors.name.message}</p>
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="subdomain">Subdomain</Label>
+            <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <Input
                   id="subdomain"
-                  placeholder="acme"
+                  label="Subdomain"
                   className="flex-1"
                   {...register("subdomain")}
                 />
-                <span className="whitespace-nowrap text-sm text-muted-foreground">
+                <span className="whitespace-nowrap text-sm text-muted-foreground mt-4">
                   .zarntaxsync.com
                 </span>
               </div>
@@ -137,12 +134,11 @@ function NewTenantPage() {
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="ntnCnic">NTN / CNIC</Label>
+            <div className="space-y-1">
               <Input
                 id="ntnCnic"
+                label="NTN / CNIC"
                 inputMode="numeric"
-                placeholder="7-digit NTN or 13-digit CNIC"
                 {...register("ntnCnic")}
               />
               {errors.ntnCnic && (
@@ -151,12 +147,11 @@ function NewTenantPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="planType">Plan</Label>
               <Select
                 value={planType}
                 onValueChange={(v) => setValue("planType", v as PlanType)}
               >
-                <SelectTrigger id="planType">
+                <SelectTrigger id="planType" label="Plan">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -178,33 +173,29 @@ function NewTenantPage() {
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="adminFirstName">First name</Label>
-                <Input id="adminFirstName" {...register("adminFirstName")} />
+              <div className="space-y-1">
+                <Input id="adminFirstName" label="First name" {...register("adminFirstName")} />
                 {errors.adminFirstName && (
                   <p className="text-xs text-destructive">{errors.adminFirstName.message}</p>
                 )}
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="adminLastName">Last name</Label>
-                <Input id="adminLastName" {...register("adminLastName")} />
+              <div className="space-y-1">
+                <Input id="adminLastName" label="Last name" {...register("adminLastName")} />
                 {errors.adminLastName && (
                   <p className="text-xs text-destructive">{errors.adminLastName.message}</p>
                 )}
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="adminEmail">Email</Label>
-              <Input id="adminEmail" type="email" {...register("adminEmail")} />
+            <div className="space-y-1">
+              <Input id="adminEmail" label="Email" type="email" {...register("adminEmail")} />
               {errors.adminEmail && (
                 <p className="text-xs text-destructive">{errors.adminEmail.message}</p>
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="adminPassword">Temporary password</Label>
-              <PasswordInput id="adminPassword" autoComplete="new-password" {...register("adminPassword")} />
+            <div className="space-y-1">
+              <PasswordInput id="adminPassword" label="Temporary password" autoComplete="new-password" {...register("adminPassword")} />
               {errors.adminPassword && (
                 <p className="text-xs text-destructive">{errors.adminPassword.message}</p>
               )}

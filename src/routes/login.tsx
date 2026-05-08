@@ -6,12 +6,11 @@ import { useState } from "react";
 import { Loader2, Lock, Mail, UserRound } from "lucide-react";
 import { toast } from "sonner";
 
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { login } from "@/api/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Separator } from "@/components/ui/separator";
 import { Logo } from "@/components/common/Logo";
@@ -136,36 +135,28 @@ function LoginPage() {
                   </Alert>
                 )}
 
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <div className="relative">
-                    <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="you@company.com"
-                      autoComplete="email"
-                      className="pl-9"
-                      {...register("email")}
-                    />
-                  </div>
+                <div className="space-y-1">
+                  <Input
+                    label="Email"
+                    id="email"
+                    type="email"
+                    autoComplete="email"
+                    startIcon={<Mail />}
+                    {...register("email")}
+                  />
                   {errors.email && (
                     <p className="text-xs text-destructive">{errors.email.message}</p>
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <div className="relative">
-                    <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <PasswordInput
-                      id="password"
-                      placeholder="••••••••"
-                      autoComplete="current-password"
-                      className="pl-9"
-                      {...register("password")}
-                    />
-                  </div>
+                <div className="space-y-1">
+                  <PasswordInput
+                    label="Password"
+                    id="password"
+                    autoComplete="current-password"
+                    startIcon={<Lock />}
+                    {...register("password")}
+                  />
                   {errors.password && (
                     <p className="text-xs text-destructive">{errors.password.message}</p>
                   )}

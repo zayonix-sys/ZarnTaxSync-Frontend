@@ -250,7 +250,7 @@ function ProductDialog({
     setValue,
     watch,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
   } = useForm<ProductValues>({
     resolver: zodResolver(ProductSchema),
     values:
@@ -289,25 +289,9 @@ function ProductDialog({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={onSubmit} className="space-y-3">
-          <div className="space-y-1">
-            <Label htmlFor="name">Name</Label>
-            <Input id="name" {...register("name")} />
-            {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="defaultHsCode">Default HS code</Label>
-            <Input id="defaultHsCode" placeholder="0000.00.00" {...register("defaultHsCode")} />
-            {errors.defaultHsCode && (
-              <p className="text-xs text-destructive">{errors.defaultHsCode.message}</p>
-            )}
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="defaultSaleType">Default sale type</Label>
-            <Input id="defaultSaleType" placeholder="Local" {...register("defaultSaleType")} />
-            {errors.defaultSaleType && (
-              <p className="text-xs text-destructive">{errors.defaultSaleType.message}</p>
-            )}
-          </div>
+            <Input id="name" label="Name" {...register("name")} />
+            <Input id="defaultHsCode" label="Default HS code" placeholder="0000.00.00" {...register("defaultHsCode")} />
+            <Input id="defaultSaleType" label="Default sale type" placeholder="Local" {...register("defaultSaleType")} />
           <div className="flex items-center justify-between rounded-md border p-2.5">
             <Label htmlFor="isActive" className="text-sm">
               Active

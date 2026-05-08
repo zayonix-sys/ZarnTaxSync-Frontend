@@ -15,6 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { DatePicker } from "@/components/ui/date-picker";
+import { parseISO, format } from "date-fns";
 import { useAuditLogs } from "@/hooks/useAuditLogs";
 import { formatDateTime } from "@/lib/format";
 import type { AuditLogEntry } from "@/api/auditLogs";
@@ -151,8 +153,8 @@ function AuditLogsPage() {
             })
           }
         >
-          <SelectTrigger>
-            <SelectValue placeholder="All entity types" />
+          <SelectTrigger label="Entity type">
+            <SelectValue />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All entity types</SelectItem>
@@ -163,26 +165,21 @@ function AuditLogsPage() {
             ))}
           </SelectContent>
         </Select>
-        <div className="relative">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Entity ID"
-            defaultValue={search.entityId ?? ""}
-            onChange={(e) => setSearch({ entityId: e.target.value || undefined })}
-            className="pl-9"
-          />
-        </div>
         <Input
-          type="date"
-          aria-label="From date"
-          value={search.dateFrom ?? ""}
-          onChange={(e) => setSearch({ dateFrom: e.target.value || undefined })}
+          label="Entity ID"
+          defaultValue={search.entityId ?? ""}
+          onChange={(e) => setSearch({ entityId: e.target.value || undefined })}
+          startIcon={<Search />}
         />
-        <Input
-          type="date"
-          aria-label="To date"
-          value={search.dateTo ?? ""}
-          onChange={(e) => setSearch({ dateTo: e.target.value || undefined })}
+        <DatePicker
+          label="From date"
+          date={search.dateFrom ? parseISO(search.dateFrom) : undefined}
+          onChange={(d) => setSearch({ dateFrom: d ? format(d, "yyyy-MM-dd") : undefined })}
+        />
+        <DatePicker
+          label="To date"
+          date={search.dateTo ? parseISO(search.dateTo) : undefined}
+          onChange={(d) => setSearch({ dateTo: d ? format(d, "yyyy-MM-dd") : undefined })}
         />
       </div>
 

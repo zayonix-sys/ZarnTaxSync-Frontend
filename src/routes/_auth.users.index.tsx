@@ -18,7 +18,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
 import {
   Select,
@@ -166,12 +165,11 @@ function UsersPage() {
 
       <div className="grid gap-3 sm:grid-cols-3">
         <div className="relative sm:col-span-2">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search name or email"
+            label="Search name or email"
             defaultValue={search.search ?? ""}
             onChange={(e) => setSearch({ search: e.target.value || undefined })}
-            className="pl-9"
+            startIcon={<Search />}
           />
         </div>
         <Select
@@ -180,8 +178,8 @@ function UsersPage() {
             setSearch({ branchId: v === "all" ? undefined : v })
           }
         >
-          <SelectTrigger>
-            <SelectValue placeholder="All branches" />
+          <SelectTrigger label="All branches">
+            <SelectValue />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All branches</SelectItem>
@@ -274,25 +272,22 @@ function CreateUserDialog({
         <form onSubmit={onSubmit} className="grid gap-3">
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1">
-              <Label htmlFor="firstName">First name</Label>
-              <Input id="firstName" {...register("firstName")} />
+              <Input id="firstName" label="First name" {...register("firstName")} />
               <FieldError msg={errors.firstName?.message} />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="lastName">Last name</Label>
-              <Input id="lastName" {...register("lastName")} />
+              <Input id="lastName" label="Last name" {...register("lastName")} />
               <FieldError msg={errors.lastName?.message} />
             </div>
           </div>
           <div className="space-y-1">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" {...register("email")} />
+            <Input id="email" label="Email" type="email" {...register("email")} />
             <FieldError msg={errors.email?.message} />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="password">Initial password</Label>
             <PasswordInput
               id="password"
+              label="Initial password"
               autoComplete="new-password"
               {...register("password")}
             />
@@ -300,12 +295,11 @@ function CreateUserDialog({
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1">
-              <Label>Branch</Label>
               <Select
                 value={branchId}
                 onValueChange={(v) => setValue("branchId", v, { shouldValidate: true })}
               >
-                <SelectTrigger>
+                <SelectTrigger label="Branch">
                   <SelectValue placeholder="Select branch" />
                 </SelectTrigger>
                 <SelectContent>
@@ -319,12 +313,11 @@ function CreateUserDialog({
               <FieldError msg={errors.branchId?.message} />
             </div>
             <div className="space-y-1">
-              <Label>Role</Label>
               <Select
                 value={role}
                 onValueChange={(v) => setValue("role", v as NewUserValues["role"])}
               >
-                <SelectTrigger>
+                <SelectTrigger label="Role">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

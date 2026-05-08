@@ -9,11 +9,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=Noto+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Rubik:wght@400;500;600;700&family=Sora:wght@400;500;600;700&family=Work+Sans:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <script>
-      // Apply theme before paint to prevent flash of wrong theme.
       (function () {
         try {
           var stored = localStorage.getItem("zts.theme");
@@ -26,11 +25,86 @@
               : theme;
           document.documentElement.classList.toggle("dark", resolved === "dark");
           document.documentElement.style.colorScheme = resolved;
+
+          var rawPrefs = localStorage.getItem("zts.preferences");
+          var prefs = rawPrefs ? JSON.parse(rawPrefs) : null;
+          var state = prefs && prefs.state ? prefs.state : {};
+          var accent = state.accentPreset || "blue";
+          var iconTheme = state.iconTheme || "color";
+          var radius = state.radiusPreset || "md";
+          var font = state.fontPreset || "noto";
+
+          var accentMap = {
+            blue: {
+              primary: "221 83% 53%",
+              primaryDark: "217 91% 60%",
+              sidebarAccent: "221 83% 96%",
+              sidebarAccentForeground: "221 83% 53%",
+              sidebarAccentDark: "217 50% 18%",
+              sidebarAccentForegroundDark: "217 91% 75%",
+            },
+            emerald: {
+              primary: "142 71% 35%",
+              primaryDark: "142 64% 45%",
+              sidebarAccent: "142 54% 94%",
+              sidebarAccentForeground: "142 71% 35%",
+              sidebarAccentDark: "142 38% 18%",
+              sidebarAccentForegroundDark: "142 64% 70%",
+            },
+            violet: {
+              primary: "262 83% 58%",
+              primaryDark: "262 90% 72%",
+              sidebarAccent: "262 83% 96%",
+              sidebarAccentForeground: "262 83% 58%",
+              sidebarAccentDark: "262 40% 18%",
+              sidebarAccentForegroundDark: "262 90% 78%",
+            },
+            amber: {
+              primary: "38 92% 50%",
+              primaryDark: "38 92% 55%",
+              sidebarAccent: "38 92% 92%",
+              sidebarAccentForeground: "38 92% 45%",
+              sidebarAccentDark: "38 45% 18%",
+              sidebarAccentForegroundDark: "38 92% 75%",
+            },
+            rose: {
+              primary: "346 77% 50%",
+              primaryDark: "346 82% 65%",
+              sidebarAccent: "346 77% 95%",
+              sidebarAccentForeground: "346 77% 50%",
+              sidebarAccentDark: "346 40% 18%",
+              sidebarAccentForegroundDark: "346 82% 78%",
+            },
+          };
+          var radiusMap = { sm: "0.4rem", md: "0.5rem", lg: "0.75rem" };
+          var fontMap = {
+            noto: "\"Noto Sans\"",
+            jakarta: "\"Plus Jakarta Sans\"",
+            dm: "\"DM Sans\"",
+            manrope: "\"Manrope\"",
+            rubik: "\"Rubik\"",
+            outfit: "\"Outfit\"",
+            sora: "\"Sora\"",
+            work: "\"Work Sans\"",
+          };
+
+          var p = accentMap[accent] || accentMap.blue;
+          var primary = resolved === "dark" ? p.primaryDark : p.primary;
+          var sidebarAccent = resolved === "dark" ? p.sidebarAccentDark : p.sidebarAccent;
+          var sidebarAccentForeground =
+            resolved === "dark" ? p.sidebarAccentForegroundDark : p.sidebarAccentForeground;
+          document.documentElement.style.setProperty("--primary", primary);
+          document.documentElement.style.setProperty("--ring", primary);
+          document.documentElement.style.setProperty("--sidebar-accent", sidebarAccent);
+          document.documentElement.style.setProperty("--sidebar-accent-foreground", sidebarAccentForeground);
+          document.documentElement.style.setProperty("--radius", radiusMap[radius] || radiusMap.md);
+          document.documentElement.style.setProperty("--font-sans", fontMap[font] || fontMap.noto);
+          document.documentElement.dataset.iconTheme = iconTheme;
         } catch (_) {}
       })();
     </script>
   </head>
-  <body class="h-full bg-background text-foreground antialiased">
+  <body class="h-full bg-background text-foreground font-sans antialiased">
     <div id="root" class="h-full"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

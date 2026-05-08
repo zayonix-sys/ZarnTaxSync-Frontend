@@ -11,6 +11,7 @@ import {
   Plus,
   Trash2,
 } from "lucide-react";
+import { parseISO, format as formatFn } from "date-fns";
 import { toast } from "sonner";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -34,6 +35,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   Table,
   TableBody,
@@ -259,7 +261,6 @@ function NewInvoicePage() {
   const invoiceDate = watch("invoiceDate");
   const buyerRegistrationType = watch("buyerRegistrationType");
   const buyerNtnCnic = watch("buyerNtnCnic") ?? "";
-  const debitNoteReason = watch("debitNoteReason");
   const watchedItems = watch("items");
 
   const totals = useMemo(() => {
@@ -379,8 +380,6 @@ function NewInvoicePage() {
           <CardTitle>Invoice header</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="invoiceType">Invoice type</Label>
             <Controller
               control={control}
               name="invoiceType"
@@ -389,7 +388,7 @@ function NewInvoicePage() {
                   value={field.value}
                   onValueChange={(v) => field.onChange(v as InvoiceTypeValue)}
                 >
-                  <SelectTrigger id="invoiceType">
+                  <SelectTrigger id="invoiceType" label="Invoice type">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -399,29 +398,22 @@ function NewInvoicePage() {
                 </Select>
               )}
             />
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="invoiceDate">Invoice date</Label>
-            <Input id="invoiceDate" type="date" {...register("invoiceDate")} />
-            <FieldError msg={errors.invoiceDate?.message} />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="saleType">Sale type</Label>
-            <Input id="saleType" placeholder="Local" {...register("saleType")} />
-            <FieldError msg={errors.saleType?.message} />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="scenarioId">
-              Scenario (Sandbox only)
-              {applicableScenarios && (
-                <Badge variant="outline" className="ml-2 text-[10px]">
-                  {applicableScenarios.length} applicable
-                </Badge>
+            <Controller
+              control={control}
+              name="invoiceDate"
+              render={({ field }) => (
+                <DatePicker
+                  id="invoiceDate"
+                  label="Invoice date"
+                  date={field.value ? parseISO(field.value) : undefined}
+                  onChange={(d) => field.onChange(d ? formatFn(d, "yyyy-MM-dd") : "")}
+                />
               )}
-            </Label>
+            />
+
+          <Input id="saleType" label="Sale type" placeholder="Local" {...register("saleType")} />
+
             <Controller
               control={control}
               name="scenarioId"
@@ -432,8 +424,8 @@ function NewInvoicePage() {
                     field.onChange(v === "none" ? "" : Number(v))
                   }
                 >
-                  <SelectTrigger id="scenarioId">
-                    <SelectValue placeholder="No scenario" />
+                  <SelectTrigger id="scenarioId" label="Scenario (Sandbox only)">
+                    <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">No scenario</SelectItem>
@@ -448,24 +440,15 @@ function NewInvoicePage() {
                 </Select>
               )}
             />
-          </div>
 
           {invoiceType === "DebitNote" && (
             <>
-              <div className="space-y-2">
-                <Label htmlFor="invoiceRefNo">
-                  Original invoice reference
-                </Label>
                 <Input
                   id="invoiceRefNo"
-                  placeholder="22 (NTN seller) or 28 digits (CNIC seller)"
+                  label="Original invoice reference"
                   {...register("invoiceRefNo")}
                 />
-                <FieldError msg={errors.invoiceRefNo?.message} />
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="debitNoteReason">Reason</Label>
                 <Controller
                   control={control}
                   name="debitNoteReason"
@@ -474,8 +457,8 @@ function NewInvoicePage() {
                       value={field.value || ""}
                       onValueChange={field.onChange}
                     >
-                      <SelectTrigger id="debitNoteReason">
-                        <SelectValue placeholder="Select reason" />
+                      <SelectTrigger id="debitNoteReason" label="Reason">
+                        <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         {DEBIT_NOTE_REASONS.map((r) => (
@@ -487,24 +470,13 @@ function NewInvoicePage() {
                     </Select>
                   )}
                 />
-                <FieldError msg={errors.debitNoteReason?.message} />
-              </div>
 
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="debitNoteReasonRemarks">
-                  Remarks
-                  {debitNoteReason === "Others" && (
-                    <span className="text-destructive"> *</span>
-                  )}
-                </Label>
                 <Textarea
                   id="debitNoteReasonRemarks"
+                  label="Remarks"
                   rows={2}
-                  placeholder="Optional explanatory remarks"
                   {...register("debitNoteReasonRemarks")}
                 />
-                <FieldError msg={errors.debitNoteReasonRemarks?.message} />
-              </div>
             </>
           )}
 
@@ -529,18 +501,8 @@ function NewInvoicePage() {
           <CardDescription>Pre-fill from your tenant profile.</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="sellerNtnCnic">NTN / CNIC</Label>
-            <Input id="sellerNtnCnic" {...register("sellerNtnCnic")} />
-            <FieldError msg={errors.sellerNtnCnic?.message} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="sellerBusinessName">Business name</Label>
-            <Input id="sellerBusinessName" {...register("sellerBusinessName")} />
-            <FieldError msg={errors.sellerBusinessName?.message} />
-          </div>
-          <div className="space-y-2">
-            <Label>Province</Label>
+            <Input id="sellerNtnCnic" label="NTN / CNIC" {...register("sellerNtnCnic")} />
+            <Input id="sellerBusinessName" label="Business name" {...register("sellerBusinessName")} />
             <Controller
               control={control}
               name="sellerProvince"
@@ -549,16 +511,11 @@ function NewInvoicePage() {
                   value={field.value}
                   onChange={field.onChange}
                   options={provinces}
+                  label="Province"
                 />
               )}
             />
-            <FieldError msg={errors.sellerProvince?.message} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="sellerAddress">Address</Label>
-            <Input id="sellerAddress" {...register("sellerAddress")} />
-            <FieldError msg={errors.sellerAddress?.message} />
-          </div>
+            <Input id="sellerAddress" label="Address" {...register("sellerAddress")} />
         </CardContent>
       </Card>
 
@@ -593,10 +550,8 @@ function NewInvoicePage() {
           </div>
 
           {buyerRegistrationType === "Registered" && (
-            <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="buyerNtnCnic">Buyer NTN / CNIC</Label>
-              <Input id="buyerNtnCnic" {...register("buyerNtnCnic")} />
-              <FieldError msg={errors.buyerNtnCnic?.message} />
+            <>
+              <Input id="buyerNtnCnic" label="Buyer NTN / CNIC" {...register("buyerNtnCnic")} />
               <BuyerNtnLookup
                 value={buyerNtnCnic}
                 invoiceDate={invoiceDate}
@@ -609,16 +564,10 @@ function NewInvoicePage() {
                   }
                 }}
               />
-            </div>
+            </>
           )}
 
-          <div className="space-y-2">
-            <Label htmlFor="buyerBusinessName">Business name</Label>
-            <Input id="buyerBusinessName" {...register("buyerBusinessName")} />
-            <FieldError msg={errors.buyerBusinessName?.message} />
-          </div>
-          <div className="space-y-2">
-            <Label>Province</Label>
+            <Input id="buyerBusinessName" label="Business name" {...register("buyerBusinessName")} />
             <Controller
               control={control}
               name="buyerProvince"
@@ -627,16 +576,11 @@ function NewInvoicePage() {
                   value={field.value}
                   onChange={field.onChange}
                   options={provinces}
+                  label="Province"
                 />
               )}
             />
-            <FieldError msg={errors.buyerProvince?.message} />
-          </div>
-          <div className="space-y-2 md:col-span-2">
-            <Label htmlFor="buyerAddress">Address</Label>
-            <Input id="buyerAddress" {...register("buyerAddress")} />
-            <FieldError msg={errors.buyerAddress?.message} />
-          </div>
+            <Input id="buyerAddress" label="Address" {...register("buyerAddress")} />
         </CardContent>
       </Card>
 
@@ -868,13 +812,13 @@ function ProvinceSelect({
   value,
   onChange,
   options,
+  label,
 }: {
   value: string;
   onChange: (v: string) => void;
   options?: Array<{ code: string; description: string }>;
+  label?: string;
 }) {
-  // Reasonable static fallback so the form is usable when /reference/provinces
-  // hasn't loaded yet (or backend is offline in guest mode).
   const provinces = options?.length
     ? options
     : [
@@ -888,8 +832,8 @@ function ProvinceSelect({
       ];
   return (
     <Select value={value} onValueChange={onChange}>
-      <SelectTrigger>
-        <SelectValue placeholder="Select province" />
+      <SelectTrigger label={label}>
+        <SelectValue />
       </SelectTrigger>
       <SelectContent>
         {provinces.map((p) => (

@@ -1,6 +1,7 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
+import { parseISO, format } from "date-fns";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {
@@ -35,7 +36,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
 import {
   Select,
@@ -44,6 +44,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ApiKeyOneTimeModal } from "@/components/users/ApiKeyOneTimeModal";
@@ -271,26 +272,23 @@ function ProfileTab({
       <CardContent>
         <form onSubmit={onSubmit} className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1">
-            <Label htmlFor="firstName">First name</Label>
-            <Input id="firstName" {...register("firstName")} />
+            <Input id="firstName" label="First name" {...register("firstName")} />
             {errors.firstName && (
               <p className="text-xs text-destructive">{errors.firstName.message}</p>
             )}
           </div>
           <div className="space-y-1">
-            <Label htmlFor="lastName">Last name</Label>
-            <Input id="lastName" {...register("lastName")} />
+            <Input id="lastName" label="Last name" {...register("lastName")} />
             {errors.lastName && (
               <p className="text-xs text-destructive">{errors.lastName.message}</p>
             )}
           </div>
           <div className="space-y-1 sm:col-span-2">
-            <Label>Branch</Label>
             <Select
               value={branchId}
               onValueChange={(v) => setValue("branchId", v, { shouldValidate: true })}
             >
-              <SelectTrigger>
+              <SelectTrigger label="Branch">
                 <SelectValue placeholder="Select branch" />
               </SelectTrigger>
               <SelectContent>
@@ -340,12 +338,11 @@ function RoleTab({ id, role }: { id: string; role: Role }) {
 
         <div className="flex flex-wrap items-end gap-3">
           <div className="space-y-1">
-            <Label>Change to</Label>
             <Select
               value={pending ?? ""}
               onValueChange={(v) => setPending(v as Role)}
             >
-              <SelectTrigger className="w-56">
+              <SelectTrigger className="w-56" label="Change to">
                 <SelectValue placeholder="Select new role" />
               </SelectTrigger>
               <SelectContent>
@@ -567,9 +564,9 @@ function ResetPasswordDialog({
         </DialogHeader>
         <form onSubmit={onSubmit} className="space-y-3">
           <div className="space-y-1">
-            <Label htmlFor="newPassword">New password</Label>
             <PasswordInput
               id="newPassword"
+              label="New password"
               autoComplete="new-password"
               {...register("newPassword")}
             />
@@ -578,9 +575,9 @@ function ResetPasswordDialog({
             )}
           </div>
           <div className="space-y-1">
-            <Label htmlFor="confirm">Confirm password</Label>
             <PasswordInput
               id="confirm"
+              label="Confirm password"
               autoComplete="new-password"
               {...register("confirm")}
             />
@@ -617,6 +614,7 @@ function CreateApiKeyDialog({
   runCreate: (body: { name: string; expiresAt?: string }) => Promise<CreateApiKeyResponse>;
 }) {
   const {
+    control,
     register,
     handleSubmit,
     reset,
@@ -651,14 +649,21 @@ function CreateApiKeyDialog({
         </DialogHeader>
         <form onSubmit={onSubmit} className="space-y-3">
           <div className="space-y-1">
-            <Label htmlFor="keyName">Name</Label>
-            <Input id="keyName" {...register("name")} />
+            <Input id="keyName" label="Name" {...register("name")} />
             {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
           </div>
-          <div className="space-y-1">
-            <Label htmlFor="keyExpires">Expires (optional)</Label>
-            <Input id="keyExpires" type="date" {...register("expiresAt")} />
-          </div>
+          <Controller
+            control={control}
+            name="expiresAt"
+            render={({ field }) => (
+              <DatePicker
+                id="keyExpires"
+                label="Expires (optional)"
+                date={field.value ? parseISO(field.value) : undefined}
+                onChange={(d) => field.onChange(d ? format(d, "yyyy-MM-dd") : "")}
+              />
+            )}
+          />
           <DialogFooter>
             <Button type="button" variant="ghost" onClick={onClose}>
               Cancel

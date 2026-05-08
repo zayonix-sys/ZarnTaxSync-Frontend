@@ -1,4 +1,9 @@
-import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  redirect,
+  useNavigate,
+} from "@tanstack/react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
@@ -6,13 +11,17 @@ import { z } from "zod";
 import { Loader2, Lock, Mail, Building2 } from "lucide-react";
 import { toast } from "sonner";
 
-import { onboardTenant } from "@/api/tenants";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Separator } from "@/components/ui/separator";
+import { onboardTenant } from "@/api/tenants";
 import { PasswordInput } from "@/components/ui/password-input";
 import {
   Select,
@@ -26,6 +35,7 @@ import { ThemeToggle } from "@/components/common/ThemeToggle";
 import { useAuthStore } from "@/stores/auth";
 import { normalizeError } from "@/api/client";
 import type { PlanType } from "@/api/types";
+import { Separator } from "@/components/ui/separator";
 
 const NTN_OR_CNIC = /^\d{7}$|^\d{13}$/;
 
@@ -38,8 +48,13 @@ const RegisterSchema = z.object({
   ntnCnic: z
     .string()
     .transform((v) => v.replace(/\D/g, ""))
-    .refine((v) => NTN_OR_CNIC.test(v), "Must be a 7-digit NTN or 13-digit CNIC"),
-  planType: z.enum(["Standard", "Professional", "Enterprise"]).default("Standard"),
+    .refine(
+      (v) => NTN_OR_CNIC.test(v),
+      "Must be a 7-digit NTN or 13-digit CNIC",
+    ),
+  planType: z
+    .enum(["Standard", "Professional", "Enterprise"])
+    .default("Standard"),
   adminFirstName: z.string().min(1, "First name is required").max(100),
   adminLastName: z.string().min(1, "Last name is required").max(100),
   adminEmail: z.string().email("Enter a valid email"),
@@ -96,7 +111,8 @@ function RegisterPage() {
   const planType = watch("planType");
 
   const formError = mutation.error
-    ? normalizeError(mutation.error).errors[0] ?? normalizeError(mutation.error).message
+    ? (normalizeError(mutation.error).errors[0] ??
+      normalizeError(mutation.error).message)
     : null;
 
   const onSubmit = handleSubmit(async (values) => {
@@ -159,52 +175,58 @@ function RegisterPage() {
                   Company details
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="name">Business name</Label>
-                  <Input id="name" placeholder="Acme Pvt Ltd" {...register("name")} />
+                <div className="space-y-1">
+                  <Input
+                    id="name"
+                    label="Business name"
+                    {...register("name")}
+                  />
                   {errors.name && (
-                    <p className="text-xs text-destructive">{errors.name.message}</p>
+                    <p className="text-xs text-destructive">
+                      {errors.name.message}
+                    </p>
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="subdomain">Subdomain</Label>
+                <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <Input
                       id="subdomain"
-                      placeholder="acme"
+                      label="Subdomain"
                       className="flex-1"
                       {...register("subdomain")}
                     />
-                    <span className="whitespace-nowrap text-sm text-muted-foreground">
+                    <span className="whitespace-nowrap text-sm text-muted-foreground mt-4">
                       .zarntaxsync.com
                     </span>
                   </div>
                   {errors.subdomain && (
-                    <p className="text-xs text-destructive">{errors.subdomain.message}</p>
+                    <p className="text-xs text-destructive">
+                      {errors.subdomain.message}
+                    </p>
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="ntnCnic">NTN / CNIC</Label>
+                <div className="space-y-1">
                   <Input
                     id="ntnCnic"
+                    label="NTN / CNIC"
                     inputMode="numeric"
-                    placeholder="7-digit NTN or 13-digit CNIC"
                     {...register("ntnCnic")}
                   />
                   {errors.ntnCnic && (
-                    <p className="text-xs text-destructive">{errors.ntnCnic.message}</p>
+                    <p className="text-xs text-destructive">
+                      {errors.ntnCnic.message}
+                    </p>
                   )}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="planType">Plan</Label>
                   <Select
                     value={planType}
                     onValueChange={(v) => setValue("planType", v as PlanType)}
                   >
-                    <SelectTrigger id="planType">
+                    <SelectTrigger id="planType" label="Plan">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -224,54 +246,61 @@ function RegisterPage() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-2">
-                    <Label htmlFor="adminFirstName">First name</Label>
-                    <Input id="adminFirstName" {...register("adminFirstName")} />
+                  <div className="space-y-1">
+                    <Input
+                      id="adminFirstName"
+                      label="First name"
+                      {...register("adminFirstName")}
+                    />
                     {errors.adminFirstName && (
-                      <p className="text-xs text-destructive">{errors.adminFirstName.message}</p>
+                      <p className="text-xs text-destructive">
+                        {errors.adminFirstName.message}
+                      </p>
                     )}
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="adminLastName">Last name</Label>
-                    <Input id="adminLastName" {...register("adminLastName")} />
+                  <div className="space-y-1">
+                    <Input
+                      id="adminLastName"
+                      label="Last name"
+                      {...register("adminLastName")}
+                    />
                     {errors.adminLastName && (
-                      <p className="text-xs text-destructive">{errors.adminLastName.message}</p>
+                      <p className="text-xs text-destructive">
+                        {errors.adminLastName.message}
+                      </p>
                     )}
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="adminEmail">Email</Label>
-                  <div className="relative">
-                    <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      id="adminEmail"
-                      type="email"
-                      placeholder="you@company.com"
-                      autoComplete="email"
-                      className="pl-9"
-                      {...register("adminEmail")}
-                    />
-                  </div>
+                <div className="space-y-1">
+                  <Input
+                    id="adminEmail"
+                    label="Email"
+                    type="email"
+                    autoComplete="email"
+                    startIcon={<Mail />}
+                    {...register("adminEmail")}
+                  />
                   {errors.adminEmail && (
-                    <p className="text-xs text-destructive">{errors.adminEmail.message}</p>
+                    <p className="text-xs text-destructive">
+                      {errors.adminEmail.message}
+                    </p>
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="adminPassword">Password</Label>
-                  <div className="relative">
-                    <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <PasswordInput
-                      id="adminPassword"
-                      placeholder="••••••••"
-                      autoComplete="new-password"
-                      className="pl-9"
-                      {...register("adminPassword")}
-                    />
-                  </div>
+                <div className="space-y-1">
+                  <PasswordInput
+                    id="adminPassword"
+                    label="Password"
+                    placeholder="••••••••"
+                    autoComplete="new-password"
+                    startIcon={<Lock />}
+                    {...register("adminPassword")}
+                  />
                   {errors.adminPassword && (
-                    <p className="text-xs text-destructive">{errors.adminPassword.message}</p>
+                    <p className="text-xs text-destructive">
+                      {errors.adminPassword.message}
+                    </p>
                   )}
                 </div>
 
@@ -292,7 +321,10 @@ function RegisterPage() {
 
               <div className="mt-6 text-center text-sm text-muted-foreground">
                 Already have an account?{" "}
-                <Link to="/login" className="font-medium text-foreground underline-offset-4 hover:underline">
+                <Link
+                  to="/login"
+                  className="font-medium text-foreground underline-offset-4 hover:underline"
+                >
                   Sign in
                 </Link>
               </div>

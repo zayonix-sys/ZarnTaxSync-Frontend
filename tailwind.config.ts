@@ -68,6 +68,8 @@ const config: Config = {
       },
       fontFamily: {
         sans: [
+          "var(--font-sans)",
+          "Noto Sans",
           "Inter",
           "ui-sans-serif",
           "system-ui",
@@ -77,6 +79,9 @@ const config: Config = {
           "sans-serif",
         ],
         mono: ["ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
+      },
+      boxShadow: {
+        soft: "0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.10)",
       },
       keyframes: {
         "accordion-down": {

@@ -4,8 +4,8 @@
 
 @layer base {
   :root {
-    /* Light theme — clean & minimal, blue accent matching reference design */
-    --background: 0 0% 100%;
+    --font-sans: "Noto Sans";
+    --background: 210 20% 98%;
     --foreground: 222 24% 12%;
 
     --card: 0 0% 100%;
@@ -17,13 +17,13 @@
     --primary: 221 83% 53%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 14% 96%;
+    --secondary: 210 16% 96%;
     --secondary-foreground: 222 24% 12%;
 
-    --muted: 220 14% 96%;
+    --muted: 210 16% 96%;
     --muted-foreground: 220 9% 46%;
 
-    --accent: 220 14% 96%;
+    --accent: 210 16% 96%;
     --accent-foreground: 222 24% 12%;
 
     --destructive: 0 72% 51%;
@@ -35,8 +35,8 @@
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
+    --border: 220 13% 89%;
+    --input: 220 13% 89%;
     --ring: 221 83% 53%;
 
     --sidebar: 0 0% 100%;
@@ -45,7 +45,7 @@
     --sidebar-accent-foreground: 221 83% 53%;
     --sidebar-border: 220 13% 93%;
 
-    --radius: 0.625rem;
+    --radius: 0.5rem;
   }
 
   .dark {
@@ -101,7 +101,7 @@
     @apply h-full;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
     font-feature-settings: "rlig" 1, "calt" 1, "cv11" 1, "ss01" 1;
   }
 }

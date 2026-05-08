@@ -162,15 +162,13 @@ function BranchesPage() {
         </RequireRole>
       </div>
 
-      <div className="relative max-w-sm">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          placeholder="Search by name or code"
-          defaultValue={search.search ?? ""}
-          onChange={(e) => setSearch({ search: e.target.value || undefined })}
-          className="pl-9"
-        />
-      </div>
+      <Input
+        label="Search name or code"
+        defaultValue={search.search ?? ""}
+        onChange={(e) => setSearch({ search: e.target.value || undefined })}
+        startIcon={<Search />}
+        className="max-w-sm"
+      />
 
       <DataTable<Branch, unknown>
         columns={columns}
@@ -251,7 +249,7 @@ function BranchSheet({
     setValue,
     watch,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
   } = useForm<BranchFormValues>({
     resolver: zodResolver(BranchFormSchema),
     defaultValues: {
@@ -309,39 +307,20 @@ function BranchSheet({
           </SheetDescription>
         </SheetHeader>
         <form onSubmit={onSubmit} className="mt-4 space-y-3">
-          <div className="space-y-1">
-            <Label htmlFor="code">Code</Label>
             <Input
               id="code"
+              label="Code"
               placeholder="e.g. KHI-01"
               {...register("code")}
               disabled={mode === "edit"}
             />
-            {errors.code && <p className="text-xs text-destructive">{errors.code.message}</p>}
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="name">Name</Label>
-            <Input id="name" {...register("name")} />
-            {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="address">Address</Label>
-            <Input id="address" {...register("address")} />
-          </div>
+            <Input id="name" label="Name" {...register("name")} />
+            <Input id="address" label="Address" {...register("address")} />
           <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <Label htmlFor="city">City</Label>
-              <Input id="city" {...register("city")} />
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="province">Province</Label>
-              <Input id="province" {...register("province")} />
-            </div>
+                <Input id="city" label="City" {...register("city")} />
+                <Input id="province" label="Province" {...register("province")} />
           </div>
-          <div className="space-y-1">
-            <Label htmlFor="phone">Phone</Label>
-            <Input id="phone" {...register("phone")} />
-          </div>
+            <Input id="phone" label="Phone" {...register("phone")} />
           <div className="flex items-center justify-between rounded-md border p-2.5">
             <Label htmlFor="isHeadOffice" className="text-sm">
               Head office

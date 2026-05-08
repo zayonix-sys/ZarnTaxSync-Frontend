@@ -15,7 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+
 import { PasswordInput } from "@/components/ui/password-input";
 import { changePassword, revokeToken } from "@/api/auth";
 import { useAuthStore } from "@/stores/auth";
@@ -117,9 +117,9 @@ function ChangePasswordPage() {
           )}
           <form onSubmit={onSubmit} className="space-y-3">
             <div className="space-y-1">
-              <Label htmlFor="currentPassword">Current password</Label>
               <PasswordInput
                 id="currentPassword"
+                label="Current password"
                 autoComplete="current-password"
                 {...register("currentPassword")}
               />
@@ -128,9 +128,9 @@ function ChangePasswordPage() {
               )}
             </div>
             <div className="space-y-1">
-              <Label htmlFor="newPassword">New password</Label>
               <PasswordInput
                 id="newPassword"
+                label="New password"
                 autoComplete="new-password"
                 {...register("newPassword")}
               />
@@ -139,9 +139,9 @@ function ChangePasswordPage() {
               )}
             </div>
             <div className="space-y-1">
-              <Label htmlFor="confirmNewPassword">Confirm new password</Label>
               <PasswordInput
                 id="confirmNewPassword"
+                label="Confirm new password"
                 autoComplete="new-password"
                 {...register("confirmNewPassword")}
               />

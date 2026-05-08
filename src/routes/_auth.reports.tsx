@@ -22,7 +22,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DataTable } from "@/components/common/DataTable";
 import { InvoiceStatusBadge } from "@/components/invoice/InvoiceStatusBadge";
@@ -103,17 +102,15 @@ function ComplianceTab() {
         </CardHeader>
         <CardContent>
           <form onSubmit={onSubmit} className="space-y-3">
-            <div className="space-y-1">
-              <Label htmlFor="turnover">Annual turnover (PKR)</Label>
-              <Input
-                id="turnover"
-                type="number"
-                inputMode="numeric"
-                placeholder="e.g. 250000000"
-                value={turnover}
-                onChange={(e) => setTurnover(e.target.value)}
-              />
-            </div>
+            <Input
+              id="turnover"
+              label="Annual turnover (PKR)"
+              type="number"
+              inputMode="numeric"
+              placeholder="e.g. 250000000"
+              value={turnover}
+              onChange={(e) => setTurnover(e.target.value)}
+            />
             <Button type="submit" disabled={compliance.isPending}>
               {compliance.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
               <TrendingUp className="h-4 w-4" />
