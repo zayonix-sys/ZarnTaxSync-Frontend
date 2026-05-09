@@ -26,11 +26,25 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "sticky top-0 flex h-screen shrink-0 flex-col border-r bg-sidebar text-sidebar-foreground shadow-soft transition-[width] duration-200",
+        "sticky top-0 flex h-screen shrink-0 flex-col border-r bg-sidebar text-sidebar-foreground shadow-soft transition-[width] duration-200 relative",
         collapsed ? "w-[68px]" : "w-[240px]",
       )}
       aria-label="Primary navigation"
     >
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={toggleSidebar}
+        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        className="absolute -right-3 top-1/2 z-50 h-8 w-8 -translate-y-1/2 rounded-full border bg-background shadow-sm"
+      >
+        {collapsed ? (
+          <ChevronRight className="h-4 w-4" />
+        ) : (
+          <ChevronLeft className="h-4 w-4" />
+        )}
+      </Button>
+
       <div
         className={cn(
           "flex h-16 items-center border-b border-sidebar-border px-4",
@@ -187,24 +201,6 @@ export function Sidebar() {
         </ul>
       </nav>
 
-      <div className="border-t border-sidebar-border p-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={toggleSidebar}
-          className="w-full justify-center text-muted-foreground"
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          {collapsed ? (
-            <ChevronRight className="h-4 w-4" />
-          ) : (
-            <>
-              <ChevronLeft className="h-4 w-4" />
-              <span className="ml-2">Collapse</span>
-            </>
-          )}
-        </Button>
-      </div>
     </aside>
   );
 }
