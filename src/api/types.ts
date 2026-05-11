@@ -71,7 +71,6 @@ export interface NormalizedError {
 export type Environment = "Sandbox" | "Production";
 export type PlanType = "Standard" | "Professional" | "Enterprise";
 
-/** Tenant DTO (Phase 2). businessActivity / sector are stand-ins until backend N4 ships. */
 export interface Tenant {
   id: string;
   name: string;
@@ -81,9 +80,28 @@ export interface Tenant {
   isActive: boolean;
   branchCount: number;
   userCount: number;
-  /** Tenant admin contact email (list projection from backend). */
   adminEmail?: string | null;
   createdAt: string;
+  // Extended registration fields
+  strn?: string | null;
+  businessEntityType?: string | null;
+  registrationStatus?: string | null;
+  businessActivity?: string | null;
+  industryType?: string | null;
+  businessAddress?: string | null;
+  city?: string | null;
+  province?: string | null;
+  phone?: string | null;
+}
+
+export interface TenantFbrVerificationResponse {
+  registrationNo: string;
+  businessEntityType: string;
+  registrationStatus: string;
+  isRegistered: boolean;
+  isActive: boolean;
+  businessName?: string | null;
+  address?: string | null;
 }
 
 export interface TokenStatus {

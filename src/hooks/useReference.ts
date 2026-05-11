@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   checkRegistrationType,
   checkStatl,
+  getCities,
   getProvinces,
   getRates,
   getSroItems,
@@ -86,5 +87,13 @@ export function useStatlCheck(regNo: string | null, date: string) {
     enabled: !!regNo && regNo.length >= 7 && !!date,
     staleTime: 0,
     retry: false,
+  });
+}
+
+export function useCities(provinceCode?: string | null) {
+  return useQuery({
+    queryKey: ["reference", "cities", provinceCode ?? null],
+    queryFn: () => getCities(provinceCode ?? undefined),
+    staleTime: ONE_DAY,
   });
 }

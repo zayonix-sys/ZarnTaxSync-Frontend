@@ -25,9 +25,10 @@ type TokenFormValues = z.infer<typeof TokenSchema>;
 interface FbrTokenFormProps {
   tenantId: string;
   environment: "Sandbox" | "Production";
+  onSaved?: () => void;
 }
 
-export function FbrTokenForm({ tenantId, environment }: FbrTokenFormProps) {
+export function FbrTokenForm({ tenantId, environment, onSaved }: FbrTokenFormProps) {
   const sandboxMutation = useSetSandboxToken(tenantId);
   const productionMutation = useSetProductionToken(tenantId);
 
@@ -47,6 +48,7 @@ export function FbrTokenForm({ tenantId, environment }: FbrTokenFormProps) {
   const onSubmit = handleSubmit(async (values) => {
     await mutation.mutateAsync(values);
     reset();
+    onSaved?.();
   });
 
   return (

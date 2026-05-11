@@ -4,6 +4,7 @@ import type {
   PaginationParams,
   PlanType,
   Tenant,
+  TenantFbrVerificationResponse,
   TenantSetting,
   TokenStatus,
 } from "@/api/types";
@@ -20,6 +21,7 @@ export interface CreateTenantOnboardingRequest extends CreateTenantRequest {
   adminLastName: string;
   adminEmail: string;
   adminPassword: string;
+  strn?: string;
 }
 
 export interface TenantOnboardingResponse {
@@ -32,6 +34,13 @@ export interface UpdateTenantRequest {
   name: string;
   ntnCnic: string;
   planType: PlanType;
+  strn?: string | null;
+  businessActivity?: string | null;
+  industryType?: string | null;
+  businessAddress?: string | null;
+  city?: string | null;
+  province?: string | null;
+  phone?: string | null;
 }
 
 export async function listTenants(params: PaginationParams = {}) {
@@ -107,5 +116,14 @@ export async function setEnvironment(id: string, environment: Environment): Prom
 
 export async function getTokenStatus(id: string): Promise<TokenStatus> {
   const res = await api.get<TokenStatus>(`/tenants/${id}/token-status`);
+  return res.data;
+}
+
+export async function verifyFbrRegistration(
+  id: string,
+): Promise<TenantFbrVerificationResponse> {
+  const res = await api.post<TenantFbrVerificationResponse>(
+    `/tenants/${id}/verify-registration`,
+  );
   return res.data;
 }

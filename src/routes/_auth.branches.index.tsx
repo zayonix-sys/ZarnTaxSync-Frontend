@@ -1,4 +1,4 @@
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
 import type { ColumnDef } from "@tanstack/react-table";
@@ -138,7 +138,16 @@ function BranchesPage() {
     {
       header: () => <span className="sr-only">Actions</span>,
       id: "actions",
-      cell: ({ row }) => <BranchActiveToggle branch={row.original} />,
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" asChild>
+            <Link to="/branches/$id" params={{ id: row.original.id }}>
+              Details
+            </Link>
+          </Button>
+          <BranchActiveToggle branch={row.original} />
+        </div>
+      ),
     },
   ];
 

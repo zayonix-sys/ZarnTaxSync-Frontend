@@ -113,3 +113,15 @@ export async function checkStatl(regNo: string, date: string): Promise<StatlResu
   });
   return res.data;
 }
+
+export interface CityOption {
+  name: string;
+  provinceCode: string;
+}
+
+export async function getCities(province?: string): Promise<CityOption[]> {
+  const res = await api.get<CityOption[]>("/reference/cities", {
+    params: province ? { province } : undefined,
+  });
+  return res.data;
+}

@@ -20,6 +20,7 @@ import {
   updateTenant,
   upsertTenantSetting,
   onboardTenant,
+  verifyFbrRegistration,
   type CreateTenantRequest,
   type CreateTenantOnboardingRequest,
   type FbrTokenRequest,
@@ -152,6 +153,20 @@ export function useSetEnvironment(id: string) {
       qc.invalidateQueries({ queryKey: [TOKEN_STATUS_KEY, id] });
       qc.invalidateQueries({ queryKey: [TENANTS_KEY, id] });
       toast.success(`Environment switched to ${env}`);
+    },
+  });
+}
+
+export function useVerifyFbrRegistration(id: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => verifyFbrRegistration(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: [TENANTS_KEY, id] });
+      toast.success("FBR registration verified successfully");
+    },
+    onError: () => {
+      toast.error("FBR verification failed. Check your token and try again.");
     },
   });
 }

@@ -52,6 +52,7 @@ const RegisterSchema = z.object({
       (v) => NTN_OR_CNIC.test(v),
       "Must be a 7-digit NTN or 13-digit CNIC",
     ),
+  strn: z.string().max(17).optional(),
   planType: z
     .enum(["Standard", "Professional", "Enterprise"])
     .default("Standard"),
@@ -100,6 +101,7 @@ function RegisterPage() {
       name: "",
       subdomain: "",
       ntnCnic: "",
+      strn: "",
       planType: "Standard",
       adminFirstName: "",
       adminLastName: "",
@@ -217,6 +219,20 @@ function RegisterPage() {
                   {errors.ntnCnic && (
                     <p className="text-xs text-destructive">
                       {errors.ntnCnic.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-1">
+                  <Input
+                    id="strn"
+                    label="STRN (optional)"
+                    placeholder="Sales Tax Registration Number"
+                    {...register("strn")}
+                  />
+                  {errors.strn && (
+                    <p className="text-xs text-destructive">
+                      {errors.strn.message}
                     </p>
                   )}
                 </div>

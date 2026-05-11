@@ -6,8 +6,10 @@ export interface Branch {
   tenantId: string;
   code: string;
   name: string;
+  address?: string;
   city: string;
   province: string;
+  phone?: string;
   isActive: boolean;
   isHeadOffice: boolean;
   userCount: number;
